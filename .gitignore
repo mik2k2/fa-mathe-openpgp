@@ -1,0 +1,9 @@
+__pycache__
+data
+.idea
+pii.tex
+*.synctex.gz
+*.aux
+*.toc
+*.pdf
+*.log

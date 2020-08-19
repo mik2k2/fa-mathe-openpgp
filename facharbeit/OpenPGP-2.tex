@@ -1,0 +1,75 @@
+\documentclass[12pt]{article}
+\usepackage[german]{babel}
+\usepackage{amsmath}
+
+\title{Mathematische Hintergr\"unde und praktische Anwendung asymmetrischer Kryptographie am Beispiel von RSA und OpenPGP}
+\input{pii.tex}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\newpage
+\tableofcontents
+\newpage
+
+\section{Einleitung}
+Asymmetrische Kryptographie ist toll. Damit kann man vieles machen (verschl"usseln, unterschreiben). [Bild von Wikipedia] Im "`digitalen Zeitalter"' ist das wichtig. (TLS, IoT). OpenPGP (Phil Zimmermann) ist neben S/MIME das Standardprotokoll f"ur krypto-behandelte E-Mails, hat aber auch z.B. WoT. Ich habe einen Teil davon implementiert.
+
+\section{Mathe hinter RSA}
+Nachrichten und Schl"ussel sind Zahlen.
+Hier wahrscheinlich sehr viel aus dem RSA-Paper zitieren.
+\subsection{Wie Schl"ussel aussehen}
+Verh"altnis zwischen "offentlichem und privaten Exponenten.
+\subsubsection{Komische Funktionen}
+$\phi$ / $\lambda$
+\subsubsection{(vielleicht) modulare Arithmetik}
+\subsection{Ver-/Entschl"usselungsprozess}
+Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
+\subsection{Cool! Damit kann man auch unterschreiben}
+\subsection{Sicherheit}
+Warum ist das Problem schwer zu l"osen?
+
+\section{RSA praktisch implementieren}
+Bytes kann man einfach in Zahlen umwandeln, aber es geh"ort noch etwas mehr dazu
+\subsection{Effiziente Berechnung von $a^b \mod n$}
+Sonst w"are das alles viel zu langsam.
+\subsection{Primzahlen finden}
+Vielleicht den Teil hier auch in den Matheteil schieben. Auf jeden Fall im Anhang andere M"oglichkeiten auflisten.
+\subsection{Der PKCS\#1-Standard}
+Warum man Padding benutzt. Entweder nur die f"ur OpenPGP benutzten Teile oder alles. Vielleicht auch nur die vorletzte Version.
+\subsection{Meine Implementation}
+\begin{itemize}
+\item Schl"usselerstellung
+\item (vielleicht) \verb|pow(a, b, n)| selbst schreiben? Ist zwar etwas bl"od, aber AES habe ich ja auch selbst geschrieben.
+\item Zeigen, dass ein Grundlegener Ver-/Entschl"usselungs prozess buchst"ablich \verb|pow(text, *key)| ist
+\item (vielleicht) auf das Padding eingehen.
+\item Unterschriften
+\end{itemize}
+
+\section{OpenPGP}
+\subsection{"Ubersicht}
+Was macht OpenPGP?
+Wahrscheinlich viel aus dem OpenPGP-Standard zitieren. Vielleicht finde ich auch noch etwas deskriptives au"ser Wikipedia.
+\subsection{Meine Implementation}
+Was habe ich implementiert? Auf die hybride Krypto eingehen (AES als Unterpunkt?). Wenn erlaubt/noch Seiten "ubrig, auch auf Datenstrukturen eingehen (die wohl eher Richtung Mathe gehen als Packet-Format lesen usw.)
+Wahrscheinlich auch viel aus dem OpenPGP-Standard zitieren.
+\subsection{Beispiele}
+Es funktioniert wirklich!
+
+\section{Ausleitung}
+Facharbeitshinweise:
+\begin{quote}
+Der Schluss sollte die Fragestellung aus der Einleitung aufgreifen und die wichtigsten Untersuchungsergebnisse zusammenfassen. Er kann den Untersuchungsgegenstand in größere Zusammenhänge einordnen und einen Ausblick auf künftige Entwicklungen enthalten. Auch kann hier das methodische Vorgehen kritisch reflektiert werden.
+\end{quote}
+
+\appendix
+
+\section{kompletter Quellcode}
+
+\section{Beispieldateien}
+
+\section{weiteres Material}
+
+\section{Literatur}
+
+\end{document}
