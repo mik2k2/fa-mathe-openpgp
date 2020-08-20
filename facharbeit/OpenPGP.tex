@@ -1,6 +1,8 @@
 \documentclass[12pt]{article}
 \usepackage[german]{babel}
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
 \usepackage{xcolor}
 \usepackage{setspace}
 \usepackage[margin=2cm,left=4cm]{geometry}
@@ -60,10 +62,40 @@ habe ich mich bei meiner Teilimplementation haupts"achlich auf die durch RSA m"o
 Funktionalit"aten konzentriert\footnote{Wobei nat"urlich Unterschriften "uber Schl"ussel f"ur das WoT wichtig sind, und ich somit diesen Teilaspekt mitimplementiert habe}.
 
 \section{Mathe hinter RSA}
-Nachrichten und Schl"ussel sind Zahlen.
-Hier wahrscheinlich sehr viel aus dem RSA-Paper zitieren.
+%Nachrichten und Schl"ussel sind Zahlen.
+%Hier wahrscheinlich sehr viel aus dem RSA-Paper zitieren.
+
+Mathematisch betrachtet besteht eine Nachricht aus einer Zahl und ein Verschl"usselungsalgorithmus aus zwei Funktionen.
+Eine, im Folgenden $E(m)$, verwandelt unter Zuhilfenahme eines Schl"ussels eine Nachricht in chiffrierten Text,
+eine zweite, im Folgenden $D(c)$, verwandelt unter Zuhilfenahme eines anderen Schl"ussels --- dies ist der asymmetrische Teil ---
+den chiffrietern Text in die urspr"ungliche Nachricht. Es gilt also $m = D(E(m))$.
+Anders ausgedr"uckt: $D$ ist Umkehrfunktion von $E$. \cite{rsa}
+
 \subsection{Wie Schl"ussel aussehen}
-Verh"altnis zwischen "offentlichem und privaten Exponenten.
+%Verh"altnis zwischen "offentlichem und privaten Exponenten.
+
+Ein "offentlicher Schl"ussel besteht aus einem Paar nat"urlicher Zahlen $(e, n)$,
+ein privater aus einem Paar nat"urlicher Zahlen $(d, n)$.
+Dabei gilt, dass $n = pq$, das Produkt aus zwei ausreichend gro"sen Primzahlen. \cite{rsa}
+
+F"ur $e$ und $d$ gilt, dass $ed \equiv 1 \mod \phi(n)$,
+wobei $\phi$ die eulersche Phi-Funktion darstellt, die nachfolgend n"aher erl"autert wird. \cite{rsa}
+Damit diese Kongruenz gilt, m"ussen $e$ und $d$ relativ prim zu $\phi(n)$ sein:
+Wenn $d$ (analog f"ur $e$) einen gemeinsamen Faktor $f > 1 \in \mathbb{N}$ mit $\phi(n)$ teilte, m"usste Folgendes gelten:
+$$
+\begin{aligned}
+&d = fa ~~;~~ \phi(n) = fb && \textrm{ mit } a, b \in \mathbb{N} \\
+&efa \equiv 1 \mod fb \\
+&efa = kfb + 1 && \textrm{f"ur ein bestimmtes } k \in \mathbb{N} \\
+&ea = kb + \frac{1}{f} & \lightning &
+\end{aligned}
+$$
+Da $ea$ und $kb$ als Produkte nat"urlicher Zahlen ebenfalls nat"urliche Zahlen sind, $\frac{1}{f}$ jedoch nicht, kommt es zum Widerspruch.
+
+Am einfachsten ist es, einen geeigneten Wert f"ur $e$ festzulegen (z.B. 65537)
+und dann entsprechend $d$ zu berechnen.
+\todo{Wie kann man das berechnen?}
+
 \subsubsection{Komische Funktionen}
 $\phi$ / $\lambda$
 \subsubsection{(vielleicht) modulare Arithmetik}
