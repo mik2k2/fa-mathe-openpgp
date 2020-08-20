@@ -1,7 +1,15 @@
 \documentclass[12pt]{article}
 \usepackage[german]{babel}
 \usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{setspace}
+\usepackage[margin=2cm,left=4cm]{geometry}
+\reversemarginpar
 
+% https://tex.stackexchange.com/a/30114
+\setstretch{1.241}
+
+\newcommand{\todo}[1]{\textcolor{red}{\mbox{TODO}}\marginpar{\textcolor{red}{#1}}}
 
 % https://tex.stackexchange.com/questions/23957/how-to-set-font-to-arial-throughout-the-entire-document
 \renewcommand{\rmdefault}{phv} % Arial
