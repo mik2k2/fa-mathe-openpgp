@@ -26,7 +26,38 @@
 \newpage
 
 \section{Einleitung}
-Asymmetrische Kryptographie ist toll. Damit kann man vieles machen (verschl"usseln, unterschreiben). [Bild von Wikipedia] Im "`digitalen Zeitalter"' ist das wichtig. (TLS, IoT). OpenPGP (Phil Zimmermann) ist neben S/MIME das Standardprotokoll f"ur krypto-behandelte E-Mails, hat aber auch z.B. WoT. Ich habe einen Teil davon implementiert.
+% Asymmetrische Kryptographie ist toll. Damit kann man vieles machen (verschl"usseln, unterschreiben). [Bild von Wikipedia] Im "`digitalen Zeitalter"' ist das wichtig. (TLS, IoT). OpenPGP (Phil Zimmermann) ist neben S/MIME das Standardprotokoll f"ur krypto-behandelte E-Mails, hat aber auch z.B. WoT. Ich habe einen Teil davon implementiert.
+
+\todo{Brauche ich f"ur diese Sachen Zitate?}
+
+Traditionell waren Verschl"usselungsverfahren "`symmetrisch"', d.h., dass wie bei einem physichen Schloss 
+der gleiche Schl"ussel zur verschlie"sen (verschl"usseln) und zum Aufschlie"sen (Entschl"usseln) verwendet wird.
+Der Ver\-schl"us\-sel\-ungs\-pro\-zess ist im Laufe der Zeit komplizierter geworden (von der auch im Kopf m"oglichen Caeser-Verschl"usselung bis zur maschinellen Verschl"usselung der Enigma w"ah\-rend des zweiten Weltkriegs), jedoch hat es nie bis zuletzt 
+eine Abweichung vom Konzept eines einzigen Schl"ussels f"ur Ver- und Entschl"usselung gegeben.
+
+Nach Entwicklung der Vorl"aufer des heutigen Internets wurde dann die asymmetrische Kryptographie erfunden.
+Hier werden f"ur Ver- und Entschl"usselung separate Schl"ussel verwendet
+(wie bei einem Vorh"angeschloss, wenn man das Schlie"sen als "`"offentlichen Schl"ussel"' betrachtet),
+sodass Menschen verschl"usselt kom\-mu\-ni\-zie\-ren k"onnen, ohne vorher einen gemeinsamen Schl"ussel auszutauschen.
+Neben Verschl"usselung von Nachrichten kann das Konzept asymmetrischer Kryptographie
+auch f"ur digitale Unterschriften verwendet werden.
+
+Der erste solche Verschl"usselungsalgorithmus, der auch in der Lage ist, Unterschriften zu erstellen und zu verifizieren, ist RSA.
+Diesen m"ochte ich in dieser Arbeit n"aher betrachten und auch selbst implementieren.
+RSA wird weiterhin in verschl"usselten Verbindungen mit gr"o"seren Seiten
+wie etwa \texttt{wikipedia.org}, \\ \texttt{google.com} oder \piibigsite{} verwendet%
+\footnote{Obwohl sowohl Google als auch Wikipedia inzwischen ECC-Schl"ussel verwenden,
+sind die Schl"ussel der entsprechenden Root-CAs noch immer RSA-2048}.
+
+Neben dieser Anwendung in TLS (der Kryptographie-Komponente\footnote{
+TLS ist trotz dieser massiven Anwendung im WWW ein separates Protokoll und wird auch z.B. f"ur SMTPS oder FTPS (nicht mit SFTP zu verwechseln, welches "uber SSH l"auft) verwendet}
+von HTTPS, dem Protokoll f"ur das WWW) wird RSA auch in OpenPGP,
+welches auf dem 1991 von Phil Zimmermann ver"offentlichten PGP basiert und Einsatz bei der Ende-zu-Ende-Verschl"usselung
+(d.h., dass nur Sender und Empf"anger den Inhalt lesen k"on\-nen)
+von E-Mails findet, zur Verschl"usselung und f"ur Unterschriften verwendet.
+W"ah\-rend sich OpenPGP auch mit der Vernetzung von Schl"usseln im Sinne eines sog. "`Web of Trust"' befasst,
+habe ich mich bei meiner Teilimplementation haupts"achlich auf die durch RSA m"oglich gemachten
+Funktionalit"aten konzentriert\footnote{Wobei nat"urlich Unterschriften "uber Schl"ussel f"ur das WoT wichtig sind, und ich somit diesen Teilaspekt mitimplementiert habe}.
 
 \section{Mathe hinter RSA}
 Nachrichten und Schl"ussel sind Zahlen.
