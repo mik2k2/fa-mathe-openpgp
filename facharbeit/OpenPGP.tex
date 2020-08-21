@@ -96,8 +96,14 @@ Am einfachsten ist es, einen geeigneten Wert f"ur $e$ festzulegen (z.B. 65537)
 und dann entsprechend $d$ zu berechnen.
 \todo{Wie kann man das berechnen?}
 
-\subsubsection{Komische Funktionen}
-$\phi$ / $\lambda$
+\subsubsection{Die eulersche Phi-Funktion}
+Die eulersche Phi-Funktion $\phi(n)$ ordnet einer nat"urlichen Zahl $n$ die Anzahl der nat"urlichen Zahlen $\leq n$,
+die relativ prim zu $n$ sind, zu.
+F"ur eine Primzahl $p$ ist trivialerweise $\phi(p) = p-1$,
+da jede nat"urliche Zahl $<p$ per Definition keine Faktoren bis auf $1$ mit $p$ teilt.
+F"ur ein Produkt zweier Primzahlen $p$ und $q$ ist nach Euler
+$\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$. \cite{euler63}
+
 \subsubsection{(vielleicht) modulare Arithmetik}
 \subsection{Ver-/Entschl"usselungsprozess}
 Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
