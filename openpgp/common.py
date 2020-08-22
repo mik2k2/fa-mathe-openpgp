@@ -129,6 +129,14 @@ class DataType(enum.Enum):
     BINARY = b'b'[0]
     TEXT = b't'[0]
 
+    @classmethod
+    def _missing_(cls, value):
+        """seems to be the only way to to this..."""
+        if value == b'u'[0]:
+            return cls.TEXT
+        else:
+            raise ValueError(f'{value} is not a valid {cls.__name__}')
+
 
 class PacketType(enum.Enum):
     PUB_SESS_KEY = 1

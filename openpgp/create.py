@@ -1,6 +1,5 @@
 """Create binary representations of OpenPGP packages"""
 import binascii
-import datetime
 import hashlib
 import os
 import secrets
