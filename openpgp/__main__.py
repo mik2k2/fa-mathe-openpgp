@@ -2,10 +2,15 @@
 """Main entry point for my OpenPGP implementation"""
 import argparse
 import logging
+import os
+
 from openpgp import common
 from openpgp import parse
 from openpgp import display
 from openpgp import create
+
+
+LOAD_PATH_ENV = 'FA_MATHE_OPENPGP_LOADPATH'
 
 
 def binary_file_data(file_name):
@@ -17,13 +22,44 @@ def binary_file_data(file_name):
             return f.read()
 
 
+def do_save_message(context: common.Context, argv: argparse.Namespace):
+    """Write the selected message to STDOUT"""
+    try:
+        message = context.messages[argv.message]
+    except IndexError:
+        print('No message with index', argv.message, file=sys.stderr)
+        return 2
+    stdout_b = open(sys.stdout.fileno(), 'wb')
+    stdout_b.write(message.data)
+
+
+def do_pgpify(context: common.Context, argv: argparse.Namespace):  # noqa
+    """Convert a message to PGP format"""
+    if argv.file == '':
+        data = open(sys.stdin.fileno(), 'rb').read()
+    else:
+        try:
+            with open(argv.file, 'rb') as f:
+                data = f.read()
+        except FileNotFoundError:
+            print('No such file:', argv.file, file=sys.stderr)
+            return 2
+    msg = common.Message(
+        data=data,
+        data_type=argv.data_type,
+        filename=(argv.filename or argv.file).encode()[-255:],
+    )
+    open(sys.stdout.fileno(), 'wb').write(create.write_message(msg))
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--load',
-        nargs='*',
+        action='append',
         type=binary_file_data,
-        help='Load the specified file. May be given multiple times',
+        help='Load the specified file. May be given multiple times and supplements'
+             f' the {LOAD_PATH_ENV} environment variable.',
         default=[],
     )
     parser.add_argument(
@@ -32,49 +68,59 @@ def parse_args():
         type=str.upper,
         help='Set the logging level',
     )
-    # actions = parser.add_subparsers()
-    # actions.add_parser('info')
-    # actions.add_parser('repr')
-    # actions.add_parser('save-message')
-    # actions.add_parser('encrypt')
-    parser.add_argument(
-        'action',
-        choices='info repr save-message encrypt'.split(),
-        help='Perform this action',
+    actions = parser.add_subparsers(
+        description='The action to perform',
+    )
+    info_parser = actions.add_parser('info')
+    info_parser.set_defaults(func=lambda c, a: (print(display.display(c)), 0)[1])
+    repr_parser = actions.add_parser('repr')
+    repr_parser.set_defaults(func=lambda c, a: (print(repr(c)), 0)[1])
+    save_msg_parser = actions.add_parser('save-message')
+    save_msg_parser.set_defaults(func=do_save_message)
+    save_msg_parser.add_argument(
+        '--message',
+        help='The message index. Default: last message',
+        type=int,
+        default=-1,
+    )
+    pgpify_parser = actions.add_parser('pgpify')
+    pgpify_parser.set_defaults(func=do_pgpify)
+    pgpify_parser.add_argument(
+        'file',
+        help='The file to convert to PGP format. Default: standard input.',
+        nargs='?',
+        default='',
+    )
+    pgpify_parser.add_argument(
+        '--filename',
+        help='alternative filename to save',
+    )
+    pgpify_parser.add_argument(
+        '--textmode',
+        action='store_const',
+        dest='data_type',
+        const=common.DataType.TEXT,
+        default=common.DataType.BINARY,
     )
     return parser.parse_args()
 
 
 def main(args):
     context = common.Context()
-    for data in args.load:
+
+    env_data = []
+    for file in os.environ.get(LOAD_PATH_ENV, '').split(':'):
+        try:
+            with open(file, 'rb') as f:
+                env_data.append(f.read())
+        except OSError:
+            logging.warning(f'error reading {file} (from {LOAD_PATH_ENV})')
+
+    for data in env_data + args.load:
         context = parse.parse(context, data)
         context.temp = common.TempData()
-    if args.action == 'info':
-        print(display.display(context))
-    elif args.action == 'repr':
-        print(repr(context))
-    elif args.action == 'save-message':
-        if not context.messages:
-            print('No messages available', file=sys.stderr)
-            sys.exit(2)
-        else:
-            stdout_b = open(sys.stdout.fileno(), 'wb')
-            stdout_b.write(context.messages[-1].data)
-    elif args.action == 'encrypt':
-        stdout_b = open(sys.stdout.fileno(), 'wb')
-        msg = common.Message(
-            data=b'Hello!',
-            data_type=common.DataType.TEXT,
-            filename=b'',
-        )
-        stdout_b.write(create.encrypt_data(
-            create.write_message(msg),
-            context.keys.values(),
-            common.SymmetricAlgorithm.AES256)
-        )
-    else:
-        raise type('NeverHappens', (Exception,), {})
+
+    return (args.func or (lambda c, a: 0))(context, args)
 
 
 if __name__ == '__main__':
@@ -86,4 +132,4 @@ if __name__ == '__main__':
         format='{asctime} - {levelname}({name}): {message}',
         style='{',
     )
-    main(args)
+    sys.exit(main(args))
