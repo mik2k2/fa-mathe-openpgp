@@ -4,7 +4,7 @@ import argparse
 import logging
 import os
 
-from openpgp import common
+from openpgp import common, signature
 from openpgp import parse
 from openpgp import display
 from openpgp import create
@@ -119,6 +119,7 @@ def main(args):
     for data in env_data + args.load:
         context = parse.parse(context, data)
         context.temp = common.TempData()
+    signature.verify_signatures(context)
 
     return (args.func or (lambda c, a: 0))(context, args)
 

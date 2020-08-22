@@ -27,7 +27,13 @@ echo "$0: ----- generated keys -----"
 gpg --default-key 'Key 1' --batch --yes --sign-key 'Key 2'
 gpg --default-key 'Key 3' --batch --yes --sign-key 'Key 2'
 gpg --default-key 'Key 2' --batch --yes --sign-key 'Key 1'
-echo "$0: ----- cross-signed some keys -----"
+echo 'adduid
+Alternative UID
+testkey-1-alt-uid-openpgp-fa-mathe-sgb@mikitsu.me
+
+save
+' | gpg --command-fd 0 --edit-key 'Key 1'
+echo "$0: ----- cross-signed some keys + added alternative UID -----"
 gpg --export 'Key 1' 'Key 2' > data/public-keys
 gpg --export-secret-keys 'Key 1' > data/secret-keys
 gpg --export-secret-keys > data/complete-key-set

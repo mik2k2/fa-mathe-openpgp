@@ -1,8 +1,9 @@
 """enums and data containers used in multiple places"""
 from __future__ import annotations
 
+import os
 import dataclasses
-import typing
+from typing import Dict, Any, List, Set
 import hashlib
 import functools
 import datetime
@@ -12,25 +13,25 @@ import enum
 
 @dataclasses.dataclass
 class TempData:
-    signatures: list = dataclasses.field(default_factory=list)
-    last_user_data: bytes = None
+    building_signatures: List[Signature] = dataclasses.field(default_factory=list)
+    last_user_id: str = None
     last_key: Key = None
-    sig_reference: typing.Union[Message, Key] = None
-    sig_trailer: bytes = None
     session_key: bytes = None
-    failed_public_keys: list = dataclasses.field(default_factory=list)
+    failed_public_keys: List[Key] = dataclasses.field(default_factory=list)
     session_algo: SymmetricAlgorithm = None
 
 
 @dataclasses.dataclass
 class Context:
-    messages: list = dataclasses.field(default_factory=list)
-    keys: typing.Dict[str, Key] = dataclasses.field(default_factory=dict)
+    messages: List[Message] = dataclasses.field(default_factory=list)
+    keys: Dict[str, Key] = dataclasses.field(default_factory=dict)
     temp: TempData = dataclasses.field(default_factory=TempData, repr=False)
+    unverified_signatures: List[Signature] = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass(unsafe_hash=True)  # data is added piece by piece
 class Signature:
+    reference: SignatureReference = dataclasses.field(default=None, compare=False)
     creation_time: datetime.datetime = None
     lifetime: datetime.timedelta = None
     issuer: str = None
@@ -42,11 +43,21 @@ class Signature:
     type: SignatureType = None
     hash_algo: HashAlgorithm = None
     public_key_algo: PublicKeyAlgorithm = None
-    hashed_subpackets: list = dataclasses.field(default_factory=list, hash=False)
-    unhashed_subpackets: list = dataclasses.field(default_factory=list, hash=False)
-    critical_subpackets: list = dataclasses.field(default_factory=list, hash=False)
+    hashed_subpackets: list = dataclasses.field(default_factory=list, compare=False)
+    unhashed_subpackets: list = dataclasses.field(default_factory=list, compare=False)
+    critical_subpackets: list = dataclasses.field(default_factory=list, compare=False)
     check_bytes: bytes = dataclasses.field(default=None, repr=False)
-    value: typing.Any = dataclasses.field(default=None, repr=False)
+    value: Any = dataclasses.field(default=None, repr=False)
+    opaque_packet_values: dict = dataclasses.field(default_factory=dict, compare=False)
+
+    @property
+    def header(self):
+        return bytes((
+            4,
+            self.type.value,
+            self.public_key_algo.value,
+            self.hash_algo.value,
+        ))
 
     def __str__(self):
         r = [f'{self.type.name} signature ({self.public_key_algo.name}'
@@ -68,11 +79,11 @@ class Key:
     key_data: tuple
     fingerprint: str
     fingerprint_data: bytes
-    user_id: str = ''
+    user_ids: Dict[str, Set[Signature]] = dataclasses.field(default_factory=dict)
     parent: Key = None
     secret_data: tuple = None
     timestamp: datetime.datetime = None
-    signatures: set = dataclasses.field(default_factory=set)
+    signatures: Set[Signature] = dataclasses.field(default_factory=set)
 
     def __repr__(self):
         pairs = (f'{k}={getattr(self, k)!r}' for k in dir(self)
@@ -83,8 +94,10 @@ class Key:
 
     def __str__(self):
         status = 'Public Key' if self.secret_data is None else 'Key Pair'
-        basic = f'{status} "{self.user_id}" ({self.fingerprint})'
-        return '\n\t'.join(map(str, [basic, *self.signatures]))
+        basic = f'{status} {self.fingerprint}'
+        user_ids = ('\n\t\t'.join(map(str, [f'UID {k!r}', *v]))
+                    for k, v in self.user_ids.items())
+        return '\n\t'.join(map(str, [basic, *user_ids, *self.signatures]))
 
 
 @dataclasses.dataclass
@@ -93,16 +106,15 @@ class Message:
     data_type: DataType
     filename: bytes
     timestamp: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.now)
-    signatures: set = dataclasses.field(default_factory=set)
+    signatures: Set[Signature] = dataclasses.field(default_factory=set)
 
     def __str__(self):
         try:
-            data = self.data.decode()
+            data = repr(self.data.decode())
         except UnicodeDecodeError:
             data = '<binary data>'
         if len(data) > 50:
             data = f'{data[:25]}...{data[-25:]}'
-        data = data.replace('\n', '<LF>')
         meta = f"file \"{self.filename.decode(errors='replace')}\", {self.timestamp}"
         return '\n\t'.join(map(str, [data, meta, *self.signatures]))
 
@@ -123,6 +135,53 @@ class SignatureType(enum.Enum):
     CERT_REVOKE = 0x30
     TIMESTAMP = 0x40
     CONFIRMATION = 0x50
+
+
+@dataclasses.dataclass
+class SignatureReference:
+    sig_data: bytes = dataclasses.field(init=False, repr=False)
+    sig_set: set = dataclasses.field(init=False)
+    sig_type: SignatureType = dataclasses.field(init=False)
+
+
+@dataclasses.dataclass
+class KeyUIDSigReference(SignatureReference):
+    sig_type: SignatureType = dataclasses.field(init=True)
+    key: Key
+    user_id: str
+
+    def __post_init__(self):
+        uid_bytes = self.user_id.encode()
+        self.sig_data = b''.join((
+            self.key.fingerprint_data,
+            b'\xb4',
+            len(uid_bytes).to_bytes(4, 'big'),
+            uid_bytes,
+        ))
+        self.sig_set = self.key.user_ids[self.user_id]
+
+
+@dataclasses.dataclass
+class SubKeySigReference(SignatureReference):
+    key: Key
+    sig_type = SignatureType.SUBKEY_BIND
+
+    def __post_init__(self):
+        self.sig_data = self.key.parent.fingerprint_data + self.key.fingerprint_data
+        self.sig_set = self.key.signatures
+
+
+@dataclasses.dataclass
+class MessageSigReference(SignatureReference):
+    message: Message
+
+    def __post_init__(self):
+        self.sig_set = self.message.signatures
+        self.sig_type = SignatureType[self.message.data_type.name]
+        if self.message.data_type is DataType.TEXT:
+            self.sig_data = self.message.data.replace(os.linesep.encode(), b'\r\n')
+        else:
+            self.sig_data = self.message.data
 
 
 class DataType(enum.Enum):

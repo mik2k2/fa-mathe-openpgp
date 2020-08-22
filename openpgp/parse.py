@@ -273,9 +273,8 @@ def parse_user_id(context: Context, data: bytes) -> Context:
     if key is None:
         logger.warning('unexpected USER_ID packet')
         return context
-    key.user_id = user_id
-    context.temp.last_user_data = b''.join((
-        b'\xb4', len(data).to_bytes(4, 'big'), data))
+    context.temp.last_user_id = user_id
+    key.user_ids.setdefault(user_id, set())
     return context
 
 
