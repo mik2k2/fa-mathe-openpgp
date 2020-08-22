@@ -24,9 +24,9 @@ keygen 'Testing Key 1' testkey-1
 keygen 'Testing Key 2' testkey-2
 keygen 'Testing Key 3' testkey-3
 echo "$0: ----- generated keys -----"
-gpg --default-key 'Key 1' --sign-key 'Key 2' --yes
-gpg --default-key 'Key 3' --sign-key 'Key 2' --yes
-gpg --default-key 'Key 2' --sign-key 'Key 1' --yes
+gpg --default-key 'Key 1' --batch --yes --sign-key 'Key 2'
+gpg --default-key 'Key 3' --batch --yes --sign-key 'Key 2'
+gpg --default-key 'Key 2' --batch --yes --sign-key 'Key 1'
 echo "$0: ----- cross-signed some keys -----"
 gpg --export 'Key 1' 'Key 2' > data/public-keys
 gpg --export-secret-keys 'Key 1' > data/secret-keys
@@ -52,7 +52,9 @@ echo 'You AND some other key can read this' \
 echo "$0: ----- generated some messages -----"
 rm -r $GNUPGHOME
 
-python3 -m openpgp info --load data/*-keys data/*-message data/encrypted-binary
+load_path=$(printf '%q:' data/*-keys)$(printf '%q:' data/*-message)
+load_path="${load_path}data/encrypted-binary"
+env FA_MATHE_OPENPGP_LOADPATH="$load_path" python3 -m openpgp info
 echo "$0: ----- read generated files -----"
 echo "$0: you should see two WARNING messages (unknown signing key)"
 echo "$0: and three ERROR messages (No session key)"
