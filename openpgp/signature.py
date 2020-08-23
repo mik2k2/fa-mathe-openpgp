@@ -57,10 +57,16 @@ def verify_signatures(context: Context):
 
 def write_v4_signature(sig: Signature) -> bytes:
     """convert a Signature object to bytes representing the packet body"""
-    r = sig.header
-    r += get_subpacket_bytes(sig, sig.hashed_subpackets)
-    r += get_subpacket_bytes(sig, sig.unhashed_subpackets)
-    r.append(sig.check_bytes)
+    r = [
+        sig.header,
+        get_subpacket_bytes(sig, sig.hashed_subpackets),
+        get_subpacket_bytes(sig, sig.unhashed_subpackets),
+        sig.check_bytes,
+    ]
+    if sig.public_key_algo.name.startswith('RSA'):
+        r.append(helpers.get_mpi(sig.value))
+    else:
+        raise NotImplementedError(f"can't handle {sig.public_key_algo} signatures")
     return b''.join(r)
 
 
@@ -235,8 +241,7 @@ def parse_issuer_fp(sig: Signature, data: bytes):
         return
     data = binascii.hexlify(data[1:]).decode()
     if sig.issuer is not None:
-        if ((len(sig.issuer) == 16 and sig.issuer != data[-16:])
-                or sig.issuer != data):
+        if sig.issuer != (data[-16:] if len(sig.issuer) == 16 else data):
             logger.warning('conflicting issuer data')
     sig.issuer = data
 
