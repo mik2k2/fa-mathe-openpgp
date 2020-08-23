@@ -57,7 +57,7 @@ def do_sign(context: common.Context, argv: argparse.Namespace):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--load',
+        '-l', '--load',
         action='append',
         type=binary_file_data,
         help='Load the specified file. May be given multiple times and supplements'
@@ -80,7 +80,7 @@ def parse_args():
     save_msg_parser = actions.add_parser('save-message')
     save_msg_parser.set_defaults(func=do_save_message)
     save_msg_parser.add_argument(
-        '--message',
+        '-m', '--message',
         help='The message index. Default: last message',
         type=int,
         default=-1,
@@ -99,7 +99,7 @@ def parse_args():
         help='alternative filename to save',
     )
     pgpify_parser.add_argument(
-        '--textmode',
+        '-t', '--textmode',
         action='store_const',
         dest='data_type',
         const=common.DataType.TEXT,
@@ -112,7 +112,7 @@ def parse_args():
         help='Fingerprint, Key ID or User ID substring of the key to sign with',
     )
     sign_parser.add_argument(
-        '--message',
+        '-m', '--message',
         help='The index of the message to sign (default: last message)',
         type=int,
         default=-1,
