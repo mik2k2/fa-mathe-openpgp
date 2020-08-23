@@ -35,15 +35,11 @@ def do_save_message(context: common.Context, argv: argparse.Namespace):
 
 def do_pgpify(context: common.Context, argv: argparse.Namespace):  # noqa
     """Convert a message to PGP format"""
-    if argv.file == '':
-        data = open(sys.stdin.fileno(), 'rb').read()
-    else:
-        try:
-            with open(argv.file, 'rb') as f:
-                data = f.read()
-        except FileNotFoundError:
-            print('No such file:', argv.file, file=sys.stderr)
-            return 2
+    try:
+        data = binary_file_data(argv.file)
+    except FileNotFoundError:
+        print('No such file:', argv.file, file=sys.stderr)
+        return 2
     msg = common.Message(
         data=data,
         data_type=argv.data_type,
@@ -86,10 +82,11 @@ def parse_args():
     pgpify_parser = actions.add_parser('pgpify')
     pgpify_parser.set_defaults(func=do_pgpify)
     pgpify_parser.add_argument(
+        # We need the file name, so no type=binary_file_data
         'file',
         help='The file to convert to PGP format. Default: standard input.',
         nargs='?',
-        default='',
+        default='-',
     )
     pgpify_parser.add_argument(
         '--filename',
