@@ -48,6 +48,15 @@ def do_pgpify(context: common.Context, argv: argparse.Namespace):  # noqa
     open(sys.stdout.fileno(), 'wb').write(create.write_message(msg))
 
 
+def do_sign(context: common.Context, argv: argparse.Namespace):
+    """Sign a message"""
+    msg = context.messages[-1]
+    ref = common.MessageSigReference(msg)
+    key = context.keys[argv.key]
+    signature.create_signature(context, ref, key)
+    open(sys.stdout.fileno(), 'wb').write(create.write_message(msg))
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -99,6 +108,9 @@ def parse_args():
         const=common.DataType.TEXT,
         default=common.DataType.BINARY,
     )
+    sign_parser = actions.add_parser('sign')
+    sign_parser.set_defaults(func=do_sign)
+    sign_parser.add_argument('key')
     return parser.parse_args()
 
 

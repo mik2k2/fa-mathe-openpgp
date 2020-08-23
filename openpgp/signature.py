@@ -10,7 +10,7 @@ from typing import Tuple
 
 from openpgp.common import (
     Context, Signature, SignatureType, PublicKeyAlgorithm, HashAlgorithm,
-    SignatureReference, MessageSigReference, SubKeySigReference, KeyUIDSigReference,
+    SignatureReference, MessageSigReference, SubKeySigReference, KeyUIDSigReference, Key,
 )
 from openpgp import helpers
 from openpgp import rsa
@@ -138,6 +138,28 @@ def verify_v4_signature(context: Context, signature: Signature) \
         return False
     hashed = signature.hash_algo.prefix + hashed
     return verify_func(hashed, signature.value, sign_key.key_data)
+
+
+def create_signature(context: Context,
+                     reference: SignatureReference,
+                     key: Key,
+                     ):
+    """create a brand-new signature and add it to the appropriate place"""
+    assert key.secret_data is not None
+    sig = Signature(
+        reference=reference,
+        type=reference.sig_type,
+        hash_algo=HashAlgorithm.SHA256,
+        issuer=key.fingerprint,
+        public_key_algo=key.type,
+        creation_time=datetime.datetime.now(),
+        hashed_subpackets=[SignatureSubPacketType.ISSUER,
+                           SignatureSubPacketType.ISSUER_FINGERPRINT,
+                           SignatureSubPacketType.CREATE_TIME]
+    )
+    create_signature_value(context, sig)
+    reference.sig_set.add(sig)
+    reference.sig_set = set()
 
 
 def create_signature_value(context: Context, signature: Signature):
