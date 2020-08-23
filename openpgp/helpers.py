@@ -30,7 +30,7 @@ def get_key(keys, substring, public):
     except KeyError:
         return next((k for k in keys.values()
                      if any(substring in uid.lower() for uid in k.user_ids)
-                     and public or k.secret_data is not None), None)
+                     and (public or k.secret_data is not None)), None)
 
 
 def read_new_packet_length(data: bytes) -> Tuple[int, int]:
