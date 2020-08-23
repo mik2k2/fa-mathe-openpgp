@@ -91,6 +91,20 @@ def get_v4_signature_reference(context: Context, sig_type: SignatureType) \
         raise NotImplementedError(f"can't handle {sig_type} signatures")
 
 
+def get_v4_signature_hashed_data(signature: Signature) -> bytes:
+    """collect all required data and hash it"""
+    trailer = b''.join((
+            signature.header,
+            get_subpacket_bytes(signature, signature.hashed_subpackets),
+    ))
+    data = b''.join((
+        signature.reference.sig_data,
+        trailer,
+        b'\x04\xff' + len(trailer).to_bytes(4, 'big'),
+    ))
+    return signature.hash_algo.func(data)
+
+
 def verify_v4_signature(context: Context, signature: Signature) \
         -> bool:
     def rsa_verify(data, sig, key):
@@ -98,9 +112,9 @@ def verify_v4_signature(context: Context, signature: Signature) \
         return rsa.rsassa_pkcs1_v1_5_verify(data, sig_bytes, key)
 
     verify_func = {
-        'RSA': rsa_verify,
-        'RSA_SIGN': rsa_verify,
-    }[signature.public_key_algo.name]
+        PublicKeyAlgorithm.RSA: rsa_verify,
+        PublicKeyAlgorithm.RSA_SIGN: rsa_verify,
+    }[signature.public_key_algo]
     try:
         sign_key = context.keys[signature.issuer]
     except KeyError:
@@ -118,21 +132,30 @@ def verify_v4_signature(context: Context, signature: Signature) \
                      f'(expected {signature.reference.sig_type}).')
         return False
 
-    trailer = b''.join((
-            signature.header,
-            get_subpacket_bytes(signature, signature.hashed_subpackets),
-    ))
-    data = b''.join((
-        signature.reference.sig_data,
-        trailer,
-        b'\x04\xff' + len(trailer).to_bytes(4, 'big'),
-    ))
-    hashed = signature.hash_algo.func(data)
+    hashed = get_v4_signature_hashed_data(signature)
     if hashed[:2] != signature.check_bytes:
         logger.error('signature hash check mismatch')
         return False
     hashed = signature.hash_algo.prefix + hashed
     return verify_func(hashed, signature.value, sign_key.key_data)
+
+
+def create_signature_value(context: Context, signature: Signature):
+    """calculate a signature's value"""
+    def rsa_sign(data, key):
+        return int.from_bytes(rsa.rsassa_pkcs1_v1_5_sign(data, key), 'big')
+
+    sign_func = {
+        PublicKeyAlgorithm.RSA: rsa_sign,
+        PublicKeyAlgorithm.RSA_SIGN: rsa_sign,
+    }[signature.public_key_algo]
+    sign_key = context.keys.get(signature.issuer)
+
+    hashed = get_v4_signature_hashed_data(signature)
+    signature.check_bytes = hashed[:2]
+    hashed = signature.hash_algo.prefix + hashed
+    signature.value = sign_func(hashed, sign_key.secret_data)
+    assert verify_v4_signature(context, signature)
 
 
 def parse_v4sig_subpackets(context: Context, data: bytes, packet_list: list) \
