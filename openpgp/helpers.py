@@ -23,6 +23,16 @@ def time_to_bytes(time: datetime.datetime):
     return int(time.timestamp()).to_bytes(4, 'big')
 
 
+def get_key(keys, substring, public):
+    substring = substring.lower()
+    try:
+        return keys[substring]
+    except KeyError:
+        return next((k for k in keys.values()
+                     if any(substring in uid.lower() for uid in k.user_ids)
+                     and public or k.secret_data is not None), None)
+
+
 def read_new_packet_length(data: bytes) -> Tuple[int, int]:
     """return (length-of-length, length) of a new-format packet without partial lengths"""
     length_byte = data[0]

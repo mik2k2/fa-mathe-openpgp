@@ -4,7 +4,7 @@ import argparse
 import logging
 import os
 
-from openpgp import common, signature
+from openpgp import common, signature, helpers
 from openpgp import parse
 from openpgp import display
 from openpgp import create
@@ -24,13 +24,8 @@ def binary_file_data(file_name):
 
 def do_save_message(context: common.Context, argv: argparse.Namespace):
     """Write the selected message to STDOUT"""
-    try:
-        message = context.messages[argv.message]
-    except IndexError:
-        print('No message with index', argv.message, file=sys.stderr)
-        return 2
     stdout_b = open(sys.stdout.fileno(), 'wb')
-    stdout_b.write(message.data)
+    stdout_b.write(argv.message.data)
 
 
 def do_pgpify(context: common.Context, argv: argparse.Namespace):  # noqa
@@ -50,11 +45,13 @@ def do_pgpify(context: common.Context, argv: argparse.Namespace):  # noqa
 
 def do_sign(context: common.Context, argv: argparse.Namespace):
     """Sign a message"""
-    msg = context.messages[-1]
-    ref = common.MessageSigReference(msg)
-    key = context.keys[argv.key]
+    ref = common.MessageSigReference(argv.message)
+    key = helpers.get_key(context.keys, argv.key, False)
+    if key is None:
+        print('No such key: ', argv.key, file=sys.stderr)
+        return 2
     signature.create_signature(context, ref, key)
-    open(sys.stdout.fileno(), 'wb').write(create.write_message(msg))
+    open(sys.stdout.fileno(), 'wb').write(create.write_message(argv.message))
 
 
 def parse_args():
@@ -110,7 +107,16 @@ def parse_args():
     )
     sign_parser = actions.add_parser('sign')
     sign_parser.set_defaults(func=do_sign)
-    sign_parser.add_argument('key')
+    sign_parser.add_argument(
+        'key',
+        help='Fingerprint, Key ID or User ID substring of the key to sign with',
+    )
+    sign_parser.add_argument(
+        '--message',
+        help='The index of the message to sign (default: last message)',
+        type=int,
+        default=-1,
+    )
     return parser.parse_args()
 
 
@@ -129,6 +135,15 @@ def main(args):
         context = parse.parse(context, data)
         context.temp = common.TempData()
     signature.verify_signatures(context)
+
+    if hasattr(args, 'message'):
+        # This is a quite hacky way to do this.
+        # It would probably be better to create some kind of "deferred lookup" action
+        try:
+            args.message = context.messages[args.message]
+        except IndexError:
+            print('No message with index', args.message, file=sys.stderr)
+            return 2
 
     return (args.func or (lambda c, a: 0))(context, args)
 
