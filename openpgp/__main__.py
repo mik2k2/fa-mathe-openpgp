@@ -70,11 +70,11 @@ def parse_args():
         type=str.upper,
         help='Set the logging level',
     )
+    parser.set_defaults(func=lambda c, a: (print(display.display(c)), 0)[1])
     actions = parser.add_subparsers(
         description='The action to perform',
     )
-    info_parser = actions.add_parser('info')
-    info_parser.set_defaults(func=lambda c, a: (print(display.display(c)), 0)[1])
+    actions.add_parser('info')  # default anyway
     repr_parser = actions.add_parser('repr')
     repr_parser.set_defaults(func=lambda c, a: (print(repr(c)), 0)[1])
     save_msg_parser = actions.add_parser('save-message')
