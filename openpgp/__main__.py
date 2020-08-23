@@ -54,7 +54,27 @@ def do_sign(context: common.Context, argv: argparse.Namespace):
     open(sys.stdout.fileno(), 'wb').write(create.write_message(argv.message))
 
 
+def do_encrypt(context: common.Context, argv: argparse.Namespace):
+    """Encrypt a message"""
+    keys = [k for k in (helpers.get_key(context.keys, key_spec, True)
+                        for key_spec in argv.recipients)
+            if (print('no such Key:', k, file=sys.stderr)
+                if k is None else True)
+            ]
+    data = create.write_message(argv.message)
+    encrypted = create.encrypt_data(data, keys, argv.symm_algo)
+    open(sys.stdout.fileno(), 'wb').write(encrypted)
+
+
 def parse_args():
+    def add_message_arg(cur_parser: argparse.ArgumentParser, msg_action):
+        cur_parser.add_argument(
+            '-m', '--message',
+            help=f'The index of the message to {msg_action} (default: last message)',
+            type=int,
+            default=-1,
+        )
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-l', '--load',
@@ -79,12 +99,7 @@ def parse_args():
     repr_parser.set_defaults(func=lambda c, a: (print(repr(c)), 0)[1])
     save_msg_parser = actions.add_parser('save-message')
     save_msg_parser.set_defaults(func=do_save_message)
-    save_msg_parser.add_argument(
-        '-m', '--message',
-        help='The message index. Default: last message',
-        type=int,
-        default=-1,
-    )
+    add_message_arg(save_msg_parser, 'save')
     pgpify_parser = actions.add_parser('pgpify')
     pgpify_parser.set_defaults(func=do_pgpify)
     pgpify_parser.add_argument(
@@ -111,11 +126,24 @@ def parse_args():
         'key',
         help='Fingerprint, Key ID or User ID substring of the key to sign with',
     )
-    sign_parser.add_argument(
-        '-m', '--message',
-        help='The index of the message to sign (default: last message)',
-        type=int,
-        default=-1,
+    add_message_arg(sign_parser, 'sign')
+    encrypt_parser = actions.add_parser('encrypt')
+    encrypt_parser.set_defaults(func=do_encrypt)
+    add_message_arg(encrypt_parser, 'encrypt')
+    encrypt_parser.add_argument(
+        '-r', '--recipient',
+        help='The recipient key fingerprint, Key ID or UserID substring. '
+             'May be given multiple times.',
+        dest='recipients',
+        action='append',
+        default=[],
+    )
+    encrypt_parser.add_argument(
+        '--symm-algo',
+        help='The symmetric encryption algorithm to use',
+        type=lambda n: getattr(common.SymmetricAlgorithm, n, n),
+        choices=[a for a in common.SymmetricAlgorithm if a.name.startswith('AES')],
+        default=common.SymmetricAlgorithm.AES192,
     )
     return parser.parse_args()
 
