@@ -34,7 +34,10 @@
 
 Traditionell waren Verschl"usselungsverfahren "`symmetrisch"', d.h., dass wie bei einem physichen Schloss
 der gleiche Schl"ussel zur verschlie"sen (verschl"usseln) und zum Aufschlie"sen (Entschl"usseln) verwendet wird.
-Der Ver\-schl"us\-sel\-ungs\-pro\-zess ist im Laufe der Zeit komplizierter geworden (von der auch im Kopf m"oglichen Caeser-Verschl"usselung bis zur maschinellen Verschl"usselung der Enigma w"ah\-rend des zweiten Weltkriegs), jedoch hat es nie bis zuletzt
+Der Ver\-schl"us\-sel\-ungs\-pro\-zess ist im Laufe der Zeit komplizierter geworden
+(von der auch im Kopf m"oglichen Caesar-Verschl"usselung bis zur
+maschinellen Verschl"usselung der Enigma w"ah\-rend des zweiten Weltkriegs),
+jedoch hat es nie bis zuletzt
 eine Abweichung vom Konzept eines einzigen Schl"ussels f"ur Ver- und Entschl"usselung gegeben.
 
 Nach Entwicklung der Vorl"aufer des heutigen Internets wurde dann die asymmetrische Kryptographie erfunden.
@@ -49,7 +52,7 @@ Diesen m"ochte ich in dieser Arbeit n"aher betrachten und auch selbst implementi
 RSA wird weiterhin in verschl"usselten Verbindungen mit gr"o"seren Seiten
 wie etwa \texttt{wikipedia.org}, \\ \texttt{google.com} oder \piibigsite{} verwendet%
 \footnote{Obwohl sowohl Google als auch Wikipedia inzwischen ECC-Schl"ussel verwenden,
-sind die Schl"ussel der entsprechenden Root-CAs noch immer RSA-2048}.
+sind die Schl"ussel der entsprechenden Root-CAs noch immer RSA-2048 (Stand \today)}.
 
 Neben dieser Anwendung in TLS (der Kryptographie-Komponente\footnote{
 TLS ist trotz dieser massiven Anwendung im WWW ein separates Protokoll und wird auch z.B. f"ur SMTPS oder FTPS (nicht mit SFTP zu verwechseln, welches "uber SSH l"auft) verwendet}
@@ -67,29 +70,30 @@ Funktionalit"aten konzentriert\footnote{Wobei nat"urlich Unterschriften "uber Sc
 
 Mathematisch betrachtet besteht eine Nachricht aus einer Zahl und ein Verschl"usselungsalgorithmus aus zwei Funktionen.
 Eine, im Folgenden $E(m)$, verwandelt unter Zuhilfenahme eines Schl"ussels eine Nachricht in chiffrierten Text,
-eine zweite, im Folgenden $D(c)$, verwandelt unter Zuhilfenahme eines anderen Schl"ussels --- dies ist der asymmetrische Teil ---
-den chiffrietern Text in die urspr"ungliche Nachricht. Es gilt also $m = D(E(m))$.
-Anders ausgedr"uckt: $D$ ist Umkehrfunktion von $E$. \cite{rsa}
+eine zweite, im Folgenden $D(c)$, verwandelt unter Zuhilfenahme eines anderen Schl"ussels -- dies ist der asymmetrische Teil --
+den chiffrierten Text in die urspr"ungliche Nachricht. Es gilt also $m = D(E(m))$.
+Anders ausgedr"uckt: $D$ ist Umkehrfunktion von $E$.~\cite{rsa}
 
 \subsection{Wie Schl"ussel aussehen}
+\label{subsec:rsa:keys}
 %Verh"altnis zwischen "offentlichem und privaten Exponenten.
 
 Ein "offentlicher Schl"ussel besteht aus einem Paar nat"urlicher Zahlen $(e, n)$,
 ein privater aus einem Paar nat"urlicher Zahlen $(d, n)$.
-Dabei gilt, dass $n = pq$, das Produkt aus zwei ausreichend gro"sen Primzahlen. \cite{rsa}
+Dabei gilt, dass $n = pq$, das Produkt zweier ausreichend gro"ser Primzahlen.~\cite{rsa}
 
 F"ur $e$ und $d$ gilt, dass $ed \equiv 1 \mod \phi(n)$,
-wobei $\phi$ die eulersche Phi-Funktion darstellt, die nachfolgend n"aher erl"autert wird. \cite{rsa}
-Damit diese Kongruenz gilt, m"ussen $e$ und $d$ relativ prim zu $\phi(n)$ sein:
+wobei $\phi$ die eulersche Phi-Funktion darstellt, die nachfolgend n"aher erl"autert wird.~\cite{rsa}
+Damit diese Kongruenz gelten kann, m"ussen $e$ und $d$ relativ prim zu $\phi(n)$ sein:
 Wenn $d$ (analog f"ur $e$) einen gemeinsamen Faktor $f > 1 \in \mathbb{N}$ mit $\phi(n)$ teilte, m"usste Folgendes gelten:
-$$
+\[
 \begin{aligned}
 &d = fa ~~;~~ \phi(n) = fb && \textrm{ mit } a, b \in \mathbb{N} \\
 &efa \equiv 1 \mod fb \\
 &efa = kfb + 1 && \textrm{f"ur ein bestimmtes } k \in \mathbb{N} \\
 &ea = kb + \frac{1}{f} & \lightning &
 \end{aligned}
-$$
+\]
 Da $ea$ und $kb$ als Produkte nat"urlicher Zahlen ebenfalls nat"urliche Zahlen sind, $\frac{1}{f}$ jedoch nicht, kommt es zum Widerspruch.
 
 Am einfachsten ist es, einen geeigneten Wert f"ur $e$ festzulegen (z.B. 65537)
@@ -102,9 +106,10 @@ die relativ prim zu $n$ sind, zu.
 F"ur eine Primzahl $p$ ist trivialerweise $\phi(p) = p-1$,
 da jede nat"urliche Zahl $<p$ per Definition keine Faktoren bis auf $1$ mit $p$ teilt.
 F"ur ein Produkt zweier Primzahlen $p$ und $q$ ist nach Euler
-$\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$. \cite{euler63}
+$\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$.~\cite{euler63}
 
 \subsubsection{(vielleicht) modulare Arithmetik}
+Eher in den Anhang?
 \subsection{Ver-/Entschl"usselungsprozess}
 Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
 \subsection{Cool! Damit kann man auch unterschreiben}
@@ -154,6 +159,7 @@ Der Schluss sollte die Fragestellung aus der Einleitung aufgreifen und die wicht
 
 \section{Literatur}
 
+%! suppress = MightBreakTexify
 \renewcommand{\section}[2]{}
 \input{citations.tex}
 \end{document}
