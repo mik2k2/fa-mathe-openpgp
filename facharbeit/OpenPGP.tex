@@ -106,12 +106,71 @@ die relativ prim zu $n$ sind, zu.
 F"ur eine Primzahl $p$ ist trivialerweise $\phi(p) = p-1$,
 da jede nat"urliche Zahl $<p$ per Definition keine Faktoren bis auf $1$ mit $p$ teilt.
 F"ur ein Produkt zweier Primzahlen $p$ und $q$ ist nach Euler
-$\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$.~\cite{euler63}
+$\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$~\cite{euler63}.
 
 \subsubsection{(vielleicht) modulare Arithmetik}
 Eher in den Anhang?
 \subsection{Ver-/Entschl"usselungsprozess}
-Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
+% Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
+F"ur die Ver- und Entschl"usselungsfunktionen gilt~\cite{rsa}:
+\[
+\begin{aligned}
+E(m) = m^e \mod n \\
+D(c) = m^d \mod n
+\end{aligned}
+\]
+
+Die G"ultigkeit dieser Funktionen wird nun erl"autert.
+
+Nach Euler gilt $a^{b-1} \equiv 1 \mod b$ f"ur alle $b \in \mathbb{P}$ und $a \in \mathbb{N}$,
+wenn $a$ nicht durch $b$ teilbar ist, also $a \not\equiv 0 \mod b$~\cite{euler41}.
+Da $p$ (Faktor von $n$, s. Abs.~\ref{subsec:rsa:keys}) prim ist,
+gilt offensichtlich $a^{p-1} \equiv 1 \mod p$
+(f"ur ein beliebiges $a$ wie oben beschrieben) und somit $m \cdot a^{p-1} \equiv m \mod p$.
+Ersetzt man $a$ durch $m^{k \cdot (q-1)}$
+(wobei $k \in \mathbb{N}$ und $q$ der zweite Faktor $n$s ist), erh"alt man~\cite{rsa}:
+\[
+\begin{aligned}
+& m \cdot \left(m^{k(q-1)}\right)^{p-1} \\
+\equiv & m \cdot m^{k(q-1)(p-1)} \\
+\equiv & m \cdot m^{k\phi(n)} \\
+\equiv & m^{k\phi(n) + 1} \\
+\equiv & m \mod p
+\end{aligned}
+\]
+
+Diese Kongruenz gilt weiterhin nur f"ur ein $a = m^{k(q-1)} \not\equiv 0 \mod p$.
+Es ist jedoch offensichtlich, dass aus $m^{k(q-1)} \equiv 0 \mod p$ folgt,
+dass $m \equiv 0 \mod p$ und somit $m^{k(q-1)} \equiv 0 \equiv m \mod p$.
+Somit gilt $m^{k\phi(n)+1} \equiv m \mod p$ f"ur alle $m \in \mathbb{N}$~\cite{rsa}.
+
+Da aus $ed \equiv 1 \mod \phi(n)$ folgt, dass $ed = k\phi(n) +1$ f"ur ein $k \in \mathbb{N}$, gilt $m^{ed} \equiv m \mod p$.
+Analog (durch Vertauschen von $p$ und $q$) kann gezeigt werden,
+dass $m^{ed} \equiv m \mod q$ gilt~\cite{rsa}.
+
+Aus diesen Kongruenzen lassen sich die folgenden beiden Gleichungen ableiten,
+wobei $a, b \in \mathbb{N}$:
+
+\[
+\begin{aligned}
+ap + m = m^{ed} \land ~~~ bq + m = m^{ed} \\
+\iff m^{ed} - m = ap = bq
+\end{aligned}
+\]
+
+Da $p$ und $q$ als Primzahlen keine Faktoren teilen, folgt aus $ap = bq$,
+dass $a$ durch $q$ teilbar ist und $b$ durch $p$ teilbar ist.
+Setzt man $c = \frac{a}{q} = \frac{b}{p}$ ($c \in \mathbb{N}$),
+sieht man, dass $cn = m^{ed} - m$~\cite{pii1}.
+Schreibt man diese Gleichung als Kongruenz, erh"alt man:
+
+\[
+m^{ed} \equiv m \mod n
+\]
+
+An dieser letzten Kongruenz sieht man, dass $D(E(m)) = (m^e)^d = m^{ed} \equiv m$,
+die Ver- und Entschl"usselungsfunktionen also tats"achlich funktionieren.
+
 \subsection{Cool! Damit kann man auch unterschreiben}
 \subsection{Sicherheit}
 Warum ist das Problem schwer zu l"osen?
