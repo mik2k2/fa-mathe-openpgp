@@ -68,11 +68,15 @@ Funktionalit"aten konzentriert\footnote{Wobei nat"urlich Unterschriften "uber Sc
 %Nachrichten und Schl"ussel sind Zahlen.
 %Hier wahrscheinlich sehr viel aus dem RSA-Paper zitieren.
 
-Mathematisch betrachtet besteht eine Nachricht aus einer Zahl und ein Verschl"usselungsalgorithmus aus zwei Funktionen.
-Eine, im Folgenden $E(m)$, verwandelt unter Zuhilfenahme eines Schl"ussels eine Nachricht in chiffrierten Text,
-eine zweite, im Folgenden $D(c)$, verwandelt unter Zuhilfenahme eines anderen Schl"ussels -- dies ist der asymmetrische Teil --
-den chiffrierten Text in die urspr"ungliche Nachricht. Es gilt also $m = D(E(m))$.
-Anders ausgedr"uckt: $D$ ist Umkehrfunktion von $E$.~\cite{rsa}
+Mathematisch betrachtet besteht eine Nachricht aus einer Zahl und ein
+Verschl"usselungsalgorithmus aus zwei Funktionen.
+Eine, im Folgenden $E(m)$, verwandelt unter Zuhilfenahme eines Schl"ussels eine
+Nachricht in chiffrierten Text, eine zweite, im Folgenden $D(c)$,
+verwandelt unter Zuhilfenahme eines anderen Schl"ussels -- dies ist der asymmetrische Teil --
+den chiffrierten Text in die urspr"ungliche Nachricht.
+Es gilt also $m = D(E(m))$.
+Anders ausgedr"uckt: $D$ ist Umkehrfunktion von $E$~\cite{rsa}.
+\todo{Hier irgendwo auch Unterschriften erw"ahnen?}
 
 \subsection{Wie Schl"ussel aussehen}
 \label{subsec:rsa:keys}
@@ -172,6 +176,16 @@ An dieser letzten Kongruenz sieht man, dass $D(E(m)) = (m^e)^d = m^{ed} \equiv m
 die Ver- und Entschl"usselungsfunktionen also tats"achlich funktionieren.
 
 \subsection{Cool! Damit kann man auch unterschreiben}
+
+Die Ver- und Entschl"usselungsfunktionen lassen sich offensichtlich
+auch verkehrt herum anwenden, ohne dass es zu Problemen kommt:
+\[D(E(m)) = (m^e)^d = m^{ed} = (m^d)^e = E(D(m))\]
+Obwohl dies zur Aufbewahrung geheimer Informationen offensichtlich suboptimal ist,
+da der "offentliche Schl"ussel "offentlich sein soll, k"onnen damit Unterschriften erstellt werden.
+Da nur jemand mit Zugang zu einem privaten Schl"ussel $s = D(m)$ berechnen kann,
+kann man dadurch, dass man mit $E(s) = m$ verifizieren, dass $m$ tats"achlich vom
+Inhaber des privaten Schl"ussels verschickt wurde.
+
 \subsection{Sicherheit}
 Warum ist das Problem schwer zu l"osen?
 
