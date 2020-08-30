@@ -187,7 +187,29 @@ kann man dadurch, dass man mit $E(s) = m$ verifizieren, dass $m$ tats"achlich vo
 Inhaber des privaten Schl"ussels verschickt wurde.
 
 \subsection{Sicherheit}
-Warum ist das Problem schwer zu l"osen?
+
+Kennt man die Faktoren $p$ und $q$, kann man leicht $\phi(n)$ und somit auch $d$ berechnen.
+Die Faktorisierung wird jedoch schon seit Jartausenden untersucht,
+ohne dass eine effiziente Methode gefunden wurde%
+\footnote{f"ur Quantencomputer existieren effiziente Algorithmen,
+jedoch wurden keine ausreichender Gr"o"se gebaut}~\cite{rsa}.
+
+Die Berechnung von $\phi(n)$, ohne "uber die Faktoren zu gehen,
+jedoch kann diese Kenntnis wie folgt in Kenntnis von $p$ und $q$
+umgewandelt werden, sodass die Berechnung von $\phi(n)$
+und die Faktorisierung $n$s "aquivalent sind.
+
+Kennt man $\phi(n)$, kann man "uber $\phi(n) = (p-1)(q-1) = n - (p+q) + 1$
+die Summe $p+q$ berechnen.
+Danach kann man mit $(p+q)^2 = p^2 + 2n + q^2 = p^2 - 2n + q^2 + 4n = (p-q)^2 + 4n$
+der die Differenz $p-q$ und folgend $q = \frac{(p+q) - (p-q)}{2}$ berechnet werden.
+Dadurch hat man die Faktoren von $n$ berechnet~\cite{rsa}.
+
+Trotz der "Aquivalenz zur Faktorisierung in diesem (und einigen weiteren,
+hier nicht aufgef"uhrten F"allen, die in~\cite{rsa} genannt werden),
+ist nicht automatisch jede Methode, die RSA bricht, eine M"oglichkeit
+zur Faktorisierung~\cite{sinews}.
+\todo{Die Quelle bezieht sich auf doi:10.1.1.73.7840, lieber direkt zitieren?}
 
 \section{RSA praktisch implementieren}
 Bytes kann man einfach in Zahlen umwandeln, aber es geh"ort noch etwas mehr dazu
