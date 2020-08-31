@@ -14,32 +14,41 @@ def find_prime(bitsize, secbits=256):
 
 
 def miller_rabin(n, k):
-    r = 1
-    d = (n-1) // 2**r
+    r = n - 1
+    s = 0
+    while not r & 1:  # == not r % 2 (speed + ~25%)
+        r >>= 1  # == r // 2  (speed + ~17%)
+        s += 1
     for __ in range(k):
-        a = secrets.randbelow(n-2)
-        x = pow(a, d, n)
+        a = secrets.randbelow(n-1)
+        while a < 2:
+            a = secrets.randbelow(n-1)
+        x = pow(a, r, n)
         if x in (1, n-1):
             continue
-        for __ in range(r-1):
+        for __ in range(s-1):
             x = pow(x, 2, n)
+            if x == 1:
+                return False
             if x == n-1:
-                continue
-        return False
+                break
+        if x != n - 1:
+            return False
     return True
 
 
-def generate_key(prime_bits):
+def generate_key(mod_bits):
+    prime_bits = mod_bits // 2
     p, q = find_prime(prime_bits+5), find_prime(prime_bits-5)
     n = p*q
     e = 65537
 
-    lambda_n = least_common_multiple(p-1, q-1)
-    assert e < lambda_n and greatest_common_divisor(e, lambda_n) == 1
-    __, d, __ = extended_euclid(e, lambda_n)
+    phi_n = n - p - q + 1
+    assert e < phi_n
+    __, d, __ = extended_euclid(e, phi_n)
     if d < 0:
-        d += lambda_n
-    assert d*e % lambda_n == 1
+        d += phi_n
+    assert d*e % phi_n == 1
     assert d > 0
 
     return (d, n), (e, n)
@@ -153,22 +162,6 @@ def rsassa_pkcs1_v1_5_sign(message_hash, key):
 def rsassa_pkcs1_v1_5_verify(message_hash, signature, key):
     encoded = emsa_pkcs1_v1_5(message_hash, math.ceil(key[1].bit_length() / 8))
     return encoded == crypt_bytes(key, signature)
-
-
-def least_common_multiple(a, b):
-    return a*b // greatest_common_divisor(a, b)
-
-
-def greatest_common_divisor(a, b):
-    while True:
-        if a == 0:
-            return b
-        elif b == 0:
-            return a
-        elif a > b:
-            a %= b
-        elif b > a:
-            b %= a
 
 
 def extended_euclid(a, b):
