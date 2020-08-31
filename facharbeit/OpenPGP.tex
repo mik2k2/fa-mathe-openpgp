@@ -216,7 +216,33 @@ Bytes kann man einfach in Zahlen umwandeln, aber es geh"ort noch etwas mehr dazu
 \subsection{Effiziente Berechnung von $a^b \mod n$}
 Sonst w"are das alles viel zu langsam.
 \subsection{Primzahlen finden}
-Vielleicht den Teil hier auch in den Matheteil schieben. Auf jeden Fall im Anhang andere M"oglichkeiten auflisten.
+% Vielleicht den Teil hier auch in den Matheteil schieben. Auf jeden Fall im Anhang andere M"oglichkeiten auflisten.
+Um Schl"ussel zu generieren, braucht man zun"achst Primzahlen.
+Um diese Primzahlen zu erhalten, ist es aufgrund der Gr"o"se
+(ab ca.\@ 1024 bits bzw.\@ 308 Ziffern)
+inpraktikabel (darauf beruht die Sicherheit), alle Primzahlen zu finden.
+Daher sieht die Prozedur zur Primzahlengeneration wie folgt aus~\cite{hac}:
+\begin{itemize}
+    \item Zuf"allige Zahl der gew"unschten Gr"o"se generieren
+    \item Pr"ufen, ob die Zahl prim ist
+    \item Fortfahren, bis eine Primzahl gefunden wurde
+\end{itemize}
+
+Zur Pr"ufung einer Primzahl existieren viele verschiedene Algorithmen.
+Sie lassen sich grob in zwei Gruppen einteilen:
+die probabilistischen, die mehrfach pr"ufen, ob eine Zahl zusammengesetzt ist,
+und nach einer bestimmten Anzahl an Wiederholungen annehmen, dass die Zahl prim ist,
+und die "`echten"', die tats"achlich beweisen k"onnen, dass eine Zahl prim ist~\cite{hac}.
+
+Letztere sind generell komplexer, zeitaufw"andiger und funktionieren tw.\@ nur
+f"ur spezielle Zahlen.
+Zufallsabh"angige Tests k"onnen durch Wahl einer geeigneten Wiederholungszahl
+auch hochverl"asslich gemacht werden.
+Auch ist es m"oglich, ein hybrides Verfahren verwenden,
+indem man zun"achst mit probabilistischen Tests
+wahrscheinliche Primzahlen findet und dann mit komplexeren Tests
+diese wenige Zahlen pr"uft~\cite{hac}.
+
 \subsection{Der PKCS\#1-Standard}
 Warum man Padding benutzt. Entweder nur die f"ur OpenPGP benutzten Teile oder alles. Vielleicht auch nur die vorletzte Version.
 \subsection{Meine Implementation}
