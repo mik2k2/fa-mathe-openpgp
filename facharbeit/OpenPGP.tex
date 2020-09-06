@@ -6,7 +6,17 @@
 \usepackage{xcolor}
 \usepackage{setspace}
 \usepackage[margin=2cm,left=4cm,marginparwidth=3cm]{geometry}
+\usepackage{listings}
 \reversemarginpar
+
+\lstset{
+language=Python,
+numbers=left,
+keepspaces=true,
+keywordstyle=\color{blue},
+basicstyle=\footnotesize\ttfamily,
+numberstyle=\tiny\color{gray}
+}
 
 % https://tex.stackexchange.com/a/30114
 \setstretch{1.241}
@@ -213,7 +223,53 @@ zur Faktorisierung~\cite{sinews}.
 \section{RSA praktisch implementieren}
 Bytes kann man einfach in Zahlen umwandeln, aber es geh"ort noch etwas mehr dazu
 \subsection{Effiziente Berechnung von $a^b \mod n$}
-Sonst w"are das alles viel zu langsam.
+% Sonst w"are das alles viel zu langsam.
+
+Da man sowohl zum Ver- als auch zum Entschl"usseln $a^b \mod n$ berechnen muss,
+jedoch die jeweiligen Exponenten ($e$, $d$) in den allermeisten F"allen
+in der Gr"o"senordnung von mindestens f"unf Stellen liegen
+(der meistgenutzte "offentliche Exponent ist 65537 \todo{Beleg: Zer\-ti\-fi\-kate angucken. Zitieren?}),
+ist es notwendig, modulare Exponentiation zu optimieren,
+damit Ver- und Entschl"usselung praktikabel wird.
+
+Um modulare Exponentiation zu verschnellern, kann man entweder weniger Multiplikationen
+als $b-1$ durchf"uhren oder die durchgef"uhreten Multiplikationen schneller durchf"uhren.
+Nat"urlich ist auch beides gleichzeitig m"oglich~\cite{hac}.
+
+Ein allgemeiner Ansatz, Exponentiation zu verschnellern, ist sog.\@
+"`repeated square and multiply"' ("`wiederholtes Quadrieren und Multiplizieren"').
+In der einfachsten Form werden dabei alle $a^{(2^i)}$ multipliziert,
+f"ur die das $i$te Bit in der binaren Darstellung von $b$ gleich $1$ ist.
+Da man die Werte $a^{(2^i)}$ erhalten kann, indem man in jedem Schritt $a$ quadriert,
+und die Multiplikationen auch schrittweise erfolgen k"onnen, (s. folgenden Quellcode)
+wird hier wiederholt quadriert und multipliziert.
+Von diesem grundlegenen Algorithmus existieren Abwandlungen,
+die durch noch weniger Multiplikationen mehr Effizienz erreichen.
+Diese beschreibe ich allerdings nicht hier~\cite{hac}. \todo{Anhang?}
+
+\begin{lstlisting}
+def square_and_multiply_simple(a, b):
+    ergebnis = 1
+    for i in range(x.bit_length()):
+        if 1 & b:
+            ergebnis *= a
+        a **= 2
+        b >>= 1
+    return ergebnis
+\end{lstlisting}\cite{hac}
+
+Baut man die modulare Reduktion in die Multiplikation ein,
+bleiben die zu multiplizierenden Zahlen klein, sodass die einzelnen
+Multiplikationen schneller werden.
+Auch hier existiert eine optimierte Variante, die sog.\@ "`Montgomery-Reduktion"'.
+Dabei wird f"ur zwei ganze relativ prime Zahlen $m$ und $r$ sowie eine ganze Zahl $t$ mit $0 \leq t \le mr$
+die kleinste nat"urliche Zahl, die kongruent zu $tr^{-1} \mod m$ ist, berechnet.
+Dies kann bei man geschickter Wahl der zu multiplizierenden Zahlen
+bei optimierten square-and-multiply-Algorithmen einsetzen.
+\todo{Genau wie? Braucht aber ltr-algo}
+
+In Python ist eine optimierte modulare Exponentiation als \lstinline{pow(a, b, n)} eingebaut.
+
 \subsection{Primzahlen finden}
 % Vielleicht den Teil hier auch in den Matheteil schieben. Auf jeden Fall im Anhang andere M"oglichkeiten auflisten.
 Um Schl"ussel zu generieren, braucht man zun"achst Primzahlen.
