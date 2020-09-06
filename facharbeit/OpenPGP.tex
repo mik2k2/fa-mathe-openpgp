@@ -189,20 +189,19 @@ Inhaber des privaten Schl"ussels verschickt wurde.
 \subsection{Sicherheit}
 
 Kennt man die Faktoren $p$ und $q$, kann man leicht $\phi(n)$ und somit auch $d$ berechnen.
-Die Faktorisierung wird jedoch schon seit Jartausenden untersucht,
+Die Faktorisierung wird jedoch schon seit Jahrtausenden untersucht,
 ohne dass eine effiziente Methode gefunden wurde%
 \footnote{f"ur Quantencomputer existieren effiziente Algorithmen,
 jedoch wurden keine ausreichender Gr"o"se gebaut}~\cite{rsa}. \todo{Reichen die Beispiele hier?}
 
 Die Berechnung von $\phi(n)$, ohne "uber die Faktoren zu gehen,
-jedoch kann diese Kenntnis wie folgt in Kenntnis von $p$ und $q$
-umgewandelt werden, sodass die Berechnung von $\phi(n)$
-und die Faktorisierung $n$s \todo{Besser aussehen lassen} "aquivalent sind.
+kann wie folgt in Kenntnis von $p$ und $q$ umgewandelt werden, sodass die Berechnung von $\phi(n)$
+und die Faktorisierung $n$s \todo{Besser aussehen lassen} "aquivalent sind:
 
 Kennt man $\phi(n)$, kann man "uber $\phi(n) = (p-1)(q-1) = n - (p+q) + 1$
 die Summe $p+q$ berechnen.
 Danach kann man mit $(p+q)^2 = p^2 + 2n + q^2 = p^2 - 2n + q^2 + 4n = (p-q)^2 + 4n$
-der die Differenz $p-q$ und folgend $q = \frac{(p+q) - (p-q)}{2}$ berechnet werden.
+die Differenz $p-q$ und folgend $q = \frac{(p+q) - (p-q)}{2}$ berechnet werden.
 Dadurch hat man die Faktoren von $n$ berechnet~\cite{rsa}.
 
 Trotz der "Aquivalenz zur Faktorisierung in diesem (und einigen weiteren,
