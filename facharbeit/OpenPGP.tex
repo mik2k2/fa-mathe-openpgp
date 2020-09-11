@@ -94,10 +94,10 @@ Anders ausgedr"uckt: $D$ ist Umkehrfunktion von $E$~\cite{rsa}.
 
 Ein "offentlicher Schl"ussel besteht aus einem Paar nat"urlicher Zahlen $(e, n)$,
 ein privater aus einem Paar nat"urlicher Zahlen $(d, n)$.
-Dabei gilt, dass $n = pq$, das Produkt zweier ausreichend gro"ser Primzahlen.~\cite{rsa}
+Dabei gilt, dass $n = pq$, das Produkt zweier ausreichend gro"ser Primzahlen~\cite{rsa}.
 
 F"ur $e$ und $d$ gilt, dass $ed \equiv 1 \mod \phi(n)$,
-wobei $\phi$ die eulersche Phi-Funktion darstellt, die nachfolgend n"aher erl"autert wird.~\cite{rsa}
+wobei $\phi$ die eulersche Phi-Funktion darstellt, die nachfolgend n"aher erl"autert wird~\cite{rsa}.
 Damit diese Kongruenz gelten kann, m"ussen $e$ und $d$ relativ prim zu $\phi(n)$ sein:
 Wenn $d$ (analog f"ur $e$) einen gemeinsamen Faktor $f > 1 \in \mathbb{N}$ mit $\phi(n)$ teilte, m"usste Folgendes gelten:
 \[
@@ -108,11 +108,10 @@ Wenn $d$ (analog f"ur $e$) einen gemeinsamen Faktor $f > 1 \in \mathbb{N}$ mit $
 &ea = kb + \frac{1}{f} & \lightning &
 \end{aligned}
 \]
-Da $ea$ und $kb$ als Produkte nat"urlicher Zahlen ebenfalls nat"urliche Zahlen sind, $\frac{1}{f}$ jedoch nicht, kommt es zum Widerspruch. \todo{Ist das so OK?}
+Da $ea$ und $kb$ als Produkte nat"urlicher Zahlen ebenfalls nat"urliche Zahlen sind, $\frac{1}{f}$ jedoch nicht, kommt es zum Widerspruch.
 
-Am einfachsten ist es, einen geeigneten Wert f"ur $e$ festzulegen (z.B. 65537)
-und dann entsprechend $d$ zu berechnen.
-\todo{Erkl"aren, wie man es berechnet? (erweiterter euklidischer Algorithmus)}
+Am einfachsten ist es, einen geeigneten Wert f"ur $e$ festzulegen (z.B.\@ 65537)
+und dann mittels des erweiterten Euklidschen Algorithmus (s.~unten) $d$ zu berechnen.
 
 \subsubsection{Die eulersche Phi-Funktion}
 Die eulersche Phi-Funktion $\phi(n)$ ordnet einer nat"urlichen Zahl $n$ die Anzahl der nat"urlichen Zahlen $\leq n$,
@@ -122,8 +121,9 @@ da jede nat"urliche Zahl $<p$ per Definition keine Faktoren bis auf $1$ mit $p$ 
 F"ur ein Produkt zweier Primzahlen $p$ und $q$ ist nach Euler
 $\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$~\cite{euler63}.
 
-\subsubsection{(vielleicht) modulare Arithmetik}
-\todo{Eher in den Anhang?}
+\subsubsection{Der erweiterte Euklidsche Algorithmus}
+\todo{Schreiben. TAOCP2 S.~342f}
+
 \subsection{Ver-/Entschl"usselungsprozess}
 % Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
 F"ur die Ver- und Entschl"usselungsfunktionen gilt~\cite{rsa}:
@@ -138,7 +138,7 @@ Die G"ultigkeit dieser Funktionen wird nun erl"autert. \todo{So oder and\-ers\-h
 
 Nach Euler gilt $a^{b-1} \equiv 1 \mod b$ f"ur alle $b \in \mathbb{P}$ und $a \in \mathbb{N}$,
 wenn $a$ nicht durch $b$ teilbar ist, also $a \not\equiv 0 \mod b$~\cite{euler41}.
-Da $p$ (Faktor von $n$, s. Abs.~\ref{subsec:rsa:keys}) prim ist,
+Da $p$ (Faktor von $n$, s.~Abs.~\ref{subsec:rsa:keys}) prim ist,
 gilt offensichtlich $a^{p-1} \equiv 1 \mod p$
 (f"ur ein beliebiges $a$ wie oben beschrieben) und somit $m \cdot a^{p-1} \equiv m \mod p$.
 Ersetzt man $a$ durch $m^{k \cdot (q-1)}$
@@ -228,7 +228,9 @@ Bytes kann man einfach in Zahlen umwandeln, aber es geh"ort noch etwas mehr dazu
 Da man sowohl zum Ver- als auch zum Entschl"usseln $a^b \mod n$ berechnen muss,
 jedoch die jeweiligen Exponenten ($e$, $d$) in den allermeisten F"allen
 in der Gr"o"senordnung von mindestens f"unf Stellen liegen
-(der meistgenutzte "offentliche Exponent ist 65537 \todo{Beleg: Zer\-ti\-fi\-kate angucken. Zitieren?}),
+(der meistgenutzte "offentliche Exponent ist 65537%
+\footnote{In GnuPG und OpenSSl Defaultwert,
+und in \emph{jedem} RSA-Zertifikat, welches ich gesehen habe}),
 ist es notwendig, modulare Exponentiation zu optimieren,
 damit Ver- und Entschl"usselung praktikabel wird.
 

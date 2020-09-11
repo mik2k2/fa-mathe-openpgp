@@ -45,11 +45,11 @@ def generate_key(mod_bits):
 
     phi_n = n - p - q + 1
     assert e < phi_n
-    __, d, __ = extended_euclid(e, phi_n)
+    gcd, d, __ = extended_euclid(e, phi_n)
+    assert gcd == 1
     if d < 0:
         d += phi_n
     assert d*e % phi_n == 1
-    assert d > 0
 
     return (d, n), (e, n)
 
