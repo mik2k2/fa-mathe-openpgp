@@ -127,7 +127,58 @@ F"ur ein Produkt zweier Primzahlen $p$ und $q$ ist nach Euler
 $\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$~\cite{euler63}.
 
 \subsubsection{Der erweiterte Euklidsche Algorithmus}
-\todo{Schreiben. TAOCP2 S.~342f}
+Der einfache Euklidsche Algorithmus kann zur Berechnung des gr"o"sten gemeinsamen
+Teilers zweier Zahlen $a, b$ verwendet werden.
+Speichert man einige weitere Zahlen, erh"alt man auch zwei ganze Zahlen $x, y$, sodass
+$xa + yb = ggt(a, b)$~\cite{taocp2}.
+
+Um $d$ zu bestimmen, wenn $ed \equiv 1 \mod \phi(n) $ und $e$ sowie $\phi(n)$ bekannt sind,
+kann der erweiterte Euklidsche Algorithmus wegen der folgenden Verh"altnisse verwendet werden,
+wobei $x, y \in\mathbb{Z}$ (mittels des Algorithmus) so sind, dass $xe + y\phi(n) = 1$
+und $ed \equiv 1 \mod \phi(n)$ als $ed = k \phi(n) + 1$ f"ur ein $k \in \mathbb{Z}$:
+\[\begin{aligned}
+      &ed &=&~k \phi(n) + 1 \\
+      &&=&~k\phi(n) + xe + y\phi(n) \\
+      &&=&~xe + (k+y)\phi(n) \\
+      \iff& ed &\equiv&~xe \mod \phi(n) \\
+      \iff& d &\equiv&~x \mod \phi(n)
+  \end{aligned}
+\]
+
+Der Algorithmus selbst besteht (bei geeigneter Z"ahlweise) aus drei Schritten.
+Eingaben sind zwei nat"urliche Zahlen $a_0 > b_0$~\cite{taocp2}:
+\begin{enumerate}
+    \item Setze $s_1 \gets 1$, $s_2 \gets 0$, $t_1 \gets 0$, $t_2 \gets 1$, $a \gets a_0$, $b \gets b_0$
+    \item Falls $b = 0$: Beende, der GGT ist $a$ und $s_1 a_0 + t_1 b_0 = a$
+    \item Berechne $q = \floor{\frac{a}{b}}$ und setze zeitgleich:
+    \begin{itemize}
+        \item $a \gets b$, $b \gets a - bq$
+        \item $s_1 \gets t_2$, $s_2 \gets s_1 - s_2 q$
+        \item $t_1 \gets t_2$, $t_2 \gets t_1 - t_2 q$
+    \end{itemize}
+\end{enumerate}\cite{taocp2}
+
+\paragraph{Beispiel nach~\cite{taocp2}}\todo{Lieber eigenes Beispiel?}
+~\\
+Mit $a_0 = 40902$ und $b_0 = 24140$.
+Dargestellt ist jeweils der Stand nach Ausf"uhrung des zweiten Schritts.
+
+\begin{tabular}{c|c c c c c c c l}
+    Iteration-Nr. & $q$ & $s_1$ & $t_1$ & $a$ & $s_2$ & $t_2$ & $b$ \\
+    \hline
+    1 & -- & 1 & 0 & 40902 & 0 & 1 & 24140 \\
+    2 & 1 & 0 & 1 & 24140 & 1 & -1 & 16762 \\
+    3 & 1 & 1 & -1 & 16762 & -1 & 2 & 7378 \\
+    4 & 2 & -1 & 2 & 7378 & 3 & -5 & 2006 \\
+    5 & 3 & 3 & -5 & 2006 & -10 & 17 & 1360 \\
+    6 & 1 & -10 & 17 & 1360 & 13 & -22 & 646 \\
+    7 & 2 & 13 & -22 & 646 & -36 & 61 & 68 \\
+    8 & 9 & -36 & 61 & 68 & 337 & -571 & 34 \\
+    9 & 2 & 337 & -571 & 34 & -710 & 1203 & 0 \\
+\end{tabular}
+~\\~\\
+\noindent
+Tats"achlich ist $337 \cdot 40902 - 571 \cdot 24140 = 34 = ggt(40902, 24140)$~\cite{taocp2}.
 
 \subsection{Ver-/Entschl"usselungsprozess}
 % Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
