@@ -7,6 +7,7 @@
 \usepackage{setspace}
 \usepackage[margin=2cm,left=4cm,marginparwidth=3cm]{geometry}
 \usepackage{listings}
+\usepackage{float}
 \reversemarginpar
 
 \lstset{
@@ -18,10 +19,14 @@ basicstyle=\footnotesize\ttfamily,
 numberstyle=\tiny\color{gray}
 }
 
+\newfloat{code-snip}{htbp}{what_is_this}
+\floatname{code-snip}{Quellcodeausschnitt}
+
 % https://tex.stackexchange.com/a/30114
 \setstretch{1.241}
 
 \newcommand{\todo}[1]{\textcolor{red}{\mbox{TODO}}\marginpar{\textcolor{red}{#1}}}
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
 
 % https://tex.stackexchange.com/questions/23957/how-to-set-font-to-arial-throughout-the-entire-document
 \renewcommand{\rmdefault}{phv} % Arial
@@ -243,12 +248,13 @@ Ein allgemeiner Ansatz, Exponentiation zu verschnellern, ist sog.\@
 In der einfachsten Form werden dabei alle $a^{(2^i)}$ multipliziert,
 f"ur die das $i$te Bit in der binaren Darstellung von $b$ gleich $1$ ist.
 Da man die Werte $a^{(2^i)}$ erhalten kann, indem man in jedem Schritt $a$ quadriert,
-und die Multiplikationen auch schrittweise erfolgen k"onnen, (s. folgenden Quellcode)
+und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.\@ Quellcodeausschnitt~\ref{code:square-and-multiply})
 wird hier wiederholt quadriert und multipliziert.
 Von diesem grundlegenen Algorithmus existieren Abwandlungen,
 die durch noch weniger Multiplikationen mehr Effizienz erreichen.
 Diese beschreibe ich allerdings nicht hier~\cite{hac}. \todo{Anhang?}
 
+\begin{code-snip}
 \begin{lstlisting}
 def square_and_multiply_simple(a, b):
     ergebnis = 1
@@ -258,7 +264,10 @@ def square_and_multiply_simple(a, b):
         a **= 2
         b >>= 1
     return ergebnis
-\end{lstlisting}\cite{hac}
+\end{lstlisting}
+\caption{Implementation eines simplen square-and-multiply-Algorithmus nach~\cite{hac}}
+\label{code:square-and-multiply}
+\end{code-snip}
 
 Baut man die modulare Reduktion in die Multiplikation ein,
 bleiben die zu multiplizierenden Zahlen klein, sodass die einzelnen
