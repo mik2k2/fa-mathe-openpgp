@@ -48,7 +48,7 @@ numberstyle=\tiny\color{gray}
 \todo{Brauche ich f"ur diese Sachen Zitate?}
 
 Traditionell waren Verschl"usselungsverfahren "`symmetrisch"', d.h., dass wie bei einem physichen Schloss
-der gleiche Schl"ussel zur verschlie"sen (verschl"usseln) und zum Aufschlie"sen (Entschl"usseln) verwendet wird.
+der gleiche Schl"ussel zum Verschlie"sen (Verschl"usseln) und zum Aufschlie"sen (Entschl"usseln) verwendet wird.
 Der Ver\-schl"us\-sel\-ungs\-pro\-zess ist im Laufe der Zeit komplizierter geworden
 (von der auch im Kopf m"oglichen Caesar-Verschl"usselung bis zur
 maschinellen Verschl"usselung der Enigma w"ah\-rend des zweiten Weltkriegs),
@@ -83,8 +83,8 @@ Funktionalit"aten konzentriert\footnote{Wobei nat"urlich Unterschriften "uber Sc
 %Nachrichten und Schl"ussel sind Zahlen.
 %Hier wahrscheinlich sehr viel aus dem RSA-Paper zitieren.
 
-Mathematisch betrachtet besteht eine Nachricht aus einer Zahl und ein
-Ver\-schl"us\-sel\-ungs\-al\-go\-rith\-mus aus zwei Funktionen.
+Mathematisch betrachtet man eine Nachricht als eine Zahl und einen
+Ver\-schl"us\-sel\-ungs\-al\-go\-rith\-mus als zwei Funktionen.
 Eine, im Folgenden $E(m)$, verwandelt unter Zuhilfenahme eines Schl"ussels eine
 Nachricht in chiffrierten Text, eine zweite, im Folgenden $D(c)$,
 verwandelt unter Zuhilfenahme eines anderen Schl"ussels -- dies ist der asymmetrische Teil --
@@ -101,9 +101,10 @@ Ein "offentlicher Schl"ussel besteht aus einem Paar nat"urlicher Zahlen $(e, n)$
 ein privater aus einem Paar nat"urlicher Zahlen $(d, n)$.
 Dabei gilt, dass $n = pq$, das Produkt zweier ausreichend gro"ser Primzahlen~\cite{rsa}.
 
-F"ur $e$ und $d$ gilt, dass $ed \equiv 1 \mod \phi(n)$,
+F"ur $e$ und $d$ gilt aus nachfolgend genannten Gr"unden, dass $ed \equiv 1 \mod \phi(n)$,
 wobei $\phi$ die eulersche Phi-Funktion darstellt, die nachfolgend n"aher erl"autert wird~\cite{rsa}.
-Damit diese Kongruenz gelten kann, m"ussen $e$ und $d$ relativ prim zu $\phi(n)$ sein:
+Damit diese Kongruenz gelten kann, m"ussen $e$ und $d$ relativ prim zu $\phi(n)$ sein.
+Dies kann mittels des Widerspruchsbeweises gezeigt werden:
 Wenn $d$ (analog f"ur $e$) einen gemeinsamen Faktor $f > 1 \in \mathbb{N}$ mit $\phi(n)$ teilte, m"usste Folgendes gelten:
 \[
 \begin{aligned}
@@ -114,36 +115,25 @@ Wenn $d$ (analog f"ur $e$) einen gemeinsamen Faktor $f > 1 \in \mathbb{N}$ mit $
 \end{aligned}
 \]
 Da $ea$ und $kb$ als Produkte nat"urlicher Zahlen ebenfalls nat"urliche Zahlen sind, $\frac{1}{f}$ jedoch nicht, kommt es zum Widerspruch.
+Somit sind $e$ und $d$ relativ prim zu $\phi(n)$.
 
-Am einfachsten ist es, einen geeigneten Wert f"ur $e$ festzulegen (z.B.\@ 65537)
+Um ein Zahlenpaar zu finden, welches diese Eigenschaften hat,
+ist es am einfachsten, einen geeigneten Wert f"ur $e$ festzulegen (z.B.\@ 65537)
 und dann mittels des erweiterten Euklidschen Algorithmus (s.~unten) $d$ zu berechnen.
 
 \subsubsection{Die eulersche Phi-Funktion}
-Die eulersche Phi-Funktion $\phi(n)$ ordnet einer nat"urlichen Zahl $n$ die Anzahl der nat"urlichen Zahlen $\leq n$,
-die relativ prim zu $n$ sind, zu.
+Die eulersche Phi-Funktion $\phi(n)$ ordnet einer nat"urlichen Zahl $n$ die Anzahl
+der nat"urlichen Zahlen kleiner gleich $n$, die relativ prim zu $n$ sind, zu.
 F"ur eine Primzahl $p$ ist trivialerweise $\phi(p) = p-1$,
-da jede nat"urliche Zahl $<p$ per Definition keine Faktoren bis auf $1$ mit $p$ teilt.
+da jede nat"urliche Zahl unter $p$ per Definition keine Faktoren bis auf $1$ mit $p$ teilt.
 F"ur ein Produkt zweier Primzahlen $p$ und $q$ ist nach Euler
 $\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$~\cite{euler63}.
 
 \subsubsection{Der erweiterte Euklidsche Algorithmus}
 Der einfache Euklidsche Algorithmus kann zur Berechnung des gr"o"sten gemeinsamen
 Teilers zweier Zahlen $a, b$ verwendet werden.
-Speichert man einige weitere Zahlen, erh"alt man auch zwei ganze Zahlen $x, y$, sodass
-$xa + yb = ggt(a, b)$~\cite{taocp2}.
-
-Um $d$ zu bestimmen, wenn $ed \equiv 1 \mod \phi(n) $ und $e$ sowie $\phi(n)$ bekannt sind,
-kann der erweiterte Euklidsche Algorithmus wegen der folgenden Verh"altnisse verwendet werden,
-wobei $x, y \in\mathbb{Z}$ (mittels des Algorithmus) so sind, dass $xe + y\phi(n) = 1$
-und $ed \equiv 1 \mod \phi(n)$ als $ed = k \phi(n) + 1$ f"ur ein $k \in \mathbb{Z}$:
-\[\begin{aligned}
-      &ed &=&~k \phi(n) + 1 \\
-      &&=&~k\phi(n) + xe + y\phi(n) \\
-      &&=&~xe + (k+y)\phi(n) \\
-      \iff& ed &\equiv&~xe \mod \phi(n) \\
-      \iff& d &\equiv&~x \mod \phi(n)
-  \end{aligned}
-\]
+Speichert man einige weitere Zahlen, erh"alt man auch zwei ganze Zahlen $s, t$, sodass
+$sa + tb = ggt(a, b)$~\cite{taocp2}.
 
 Der Algorithmus selbst besteht (bei geeigneter Z"ahlweise) aus drei Schritten.
 Eingaben sind zwei nat"urliche Zahlen $a_0 > b_0$~\cite{taocp2}:
@@ -180,6 +170,24 @@ Dargestellt ist jeweils der Stand nach Ausf"uhrung des zweiten Schritts.
 \noindent
 Tats"achlich ist $337 \cdot 40902 - 571 \cdot 24140 = 34 = ggt(40902, 24140)$~\cite{taocp2}.
 
+\paragraph{Verwendbarkeit f"ur RSA}
+
+Um ein $d$ zu bestimmen, wenn $ed \equiv 1 \mod \phi(n) $ und $e$ sowie $\phi(n)$ bekannt (bzw.\@ gew"ahlt) sind,
+kann der erweiterte Euklidsche Algorithmus auf $e$ und $\phi(n)$ angewandt werden.
+Weil $\phi(n)$ und $e$ wie oben gezeigt relativ prim zueinander sind, ist ihr GGT gleich eins.
+Somit gilt f"ur die beiden weiteren vom Algorithmus ausgegebenen Zahlen $s, t$, dass $se + t\phi(n) = 1$.
+
+\noindent Mit diesen Grundagen k"onnen die folgenden "Aquivalenzen aufgestellt werden:
+\[\begin{aligned}
+      &ed &\equiv&~1 \mod \phi(n)& \\
+      \iff&ed &=&~1 + k \phi(n) &\textrm{f"ur ein }k \in \mathbb{Z}\\
+      &&=&~xe + y\phi(n) + k\phi(n)& \\
+      &&=&~xe + (y+k)\phi(n) &\\
+      \iff& ed &\equiv&~xe \mod \phi(n) &\textrm{da }y+k\textrm{ eine ganze Zahl ist}\\
+      \iff& d &\equiv&~x \mod \phi(n)
+  \end{aligned}
+\]
+
 \subsection{Ver-/Entschl"usselungsprozess}
 % Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
 F"ur die Ver- und Entschl"usselungsfunktionen gilt~\cite{rsa}:
@@ -197,24 +205,28 @@ wenn $a$ nicht durch $b$ teilbar ist, also $a \not\equiv 0 \mod b$~\cite{euler41
 Da $p$ (Faktor von $n$, s.~Abs.~\ref{subsec:rsa:keys}) prim ist,
 gilt offensichtlich $a^{p-1} \equiv 1 \mod p$
 (f"ur ein beliebiges $a$ wie oben beschrieben) und somit $m \cdot a^{p-1} \equiv m \mod p$.
-Ersetzt man $a$ durch $m^{k \cdot (q-1)}$
-(wobei $k \in \mathbb{N}$ und $q$ der zweite Faktor $n$s ist), erh"alt man~\cite{rsa}:
-\[
-\begin{aligned}
-& m \cdot \left(m^{k(q-1)}\right)^{p-1} \\
-\equiv & m \cdot m^{k(q-1)(p-1)} \\
-\equiv & m \cdot m^{k\phi(n)} \\
-\equiv & m^{k\phi(n) + 1} \\
-\equiv & m \mod p
-\end{aligned}
-\]
 
-Diese Kongruenz gilt weiterhin nur f"ur ein $a = m^{k(q-1)} \not\equiv 0 \mod p$.
-Es ist jedoch offensichtlich, dass aus $m^{k(q-1)} \equiv 0 \mod p$ folgt,
-dass $m \equiv 0 \mod p$ und somit $m^{k(q-1)} \equiv 0 \equiv m \mod p$.
+Setzt man f"ur $a$ den Wert $m^{k \cdot (q-1)}$ ein,
+wobei $k$ eine folgend n"aher bestimmte nat"urliche Zahl, $q$ der zweite Faktor von $n$
+und $m$ eine die Nachricht darstellende nat"urliche Zahl ist,
+erh"alt man f"ur die linke Seite der Kongruenz~\cite{rsa}:
+\[
+    m \cdot \left(m^{k(q-1)}\right)^{p-1} = m \cdot m^{k(q-1)(p-1)} = m \cdot m^{k\phi(n)} = m^{k\phi(n) + 1}
+\]
+Die gesamte Kongruenz lautet also $m^{k\phi(n)+1} \equiv m \mod p$.
+
+Diese Kongruenz gilt weiterhin nur f"ur $m^{k(q-1)} \not\equiv 0 \mod p$.
+
+Wenn $m^{k(q-1)} \equiv 0 \mod p$, ist $p$ Teiler von $m^{k(q-1)}$.
+Da $m^{k(q-1)}$ nicht mehr verschiedene Faktoren als $m$ hat und $p$ als Primzahl
+genua einen Primfaktor hat, teilt $p$ auch $m$.
+Als Kongruenz gescgrieben hei"st das: $m \equiv 0 \mod p$.
+Es gilt also $m^{k(q-1)} \equiv 0 \equiv m \mod p$.
 Somit gilt $m^{k\phi(n)+1} \equiv m \mod p$ f"ur alle $m \in \mathbb{N}$~\cite{rsa}.\todo{So OK?}
 
-Da aus $ed \equiv 1 \mod \phi(n)$ folgt, dass $ed = k\phi(n) +1$ f"ur ein $k \in \mathbb{N}$, gilt $m^{ed} \equiv m \mod p$.
+Da aus $ed \equiv 1 \mod \phi(n)$ folgt, dass $ed = k\phi(n) +1$ f"ur ein $k \in \mathbb{N}$,%
+\footnote{Da $e, d$ und $\phi(n)$ nat"urliche Zahlen sind, ist $k$ in diesem Fall auch nat"urlich}
+gilt $m^{ed} \equiv m \mod p$.
 Analog (durch Vertauschen von $p$ und $q$) kann gezeigt werden,
 dass $m^{ed} \equiv m \mod q$ gilt~\cite{rsa}.
 
