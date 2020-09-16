@@ -382,7 +382,35 @@ diese wenige Zahlen pr"uft~\cite{hac}.
 \todo{Auch erkl"aren, welchen ich verwende?}
 
 \subsection{Der PKCS\#1-Standard}
-Warum man Padding benutzt. Entweder nur die f"ur OpenPGP benutzten Teile oder alles. Vielleicht auch nur die vorletzte Version.
+% Warum man Padding benutzt. Entweder nur die f"ur OpenPGP benutzten Teile oder alles. Vielleicht auch nur die vorletzte Version.
+
+Auch wenn RSA wie oben beschrieben als sicher angenommen wird, kann es in der praktischen
+Anwendung beispielsweise bei kurzen Nachrichten zu Sicherheitsl"ucken kommen~\cite{sinews}.\todo{Auch komplett zitieren?}
+Um dies zu verhindern, wurde der sog.\@ Public-Key Cryptography Standard \#1 geschrieben,
+der das Format einer mit RSA Verschl"usselten Nachricht sowie einer RSA-Unterschrift festlegt.
+
+Da fr"uhere Versionen nicht gegen alle Angriffe immun waren, ist der Standard
+im Laufe der Zeit weiterentwickelt worden~\cite{sinews}.
+OpenPGP basiert jedoch noch auf Version 1.5, sodass ich im Folgenden diese Version erl"autere~\cite{rfc4480}.
+
+Vor dem Verschl"usseln wird eine Nachricht mit den Bytes \verb|00 02|
+(zur Erkennung, dass die Nachricht wie folgt foratiert ist),
+so vielen nicht genullten Bytes wie m"oglich (sodass der Gesamtwert unter $n$ bleibt)
+und einen \verb|00|-Byte (um das Ende der zuf"allien Bytes zu erkennen) pr"afixiert.
+Dies vergr"o"sert die der Nachricht entsprechende Zahl und verhindert,
+dass kurze Nachrichten Sicherheitsprobleme darstellen~\cite{rfc4480,sinews}.
+
+Bei Unterschriften wird nicht die zu unterschreibende Nachricht selbst,
+sondern ein sog.\@ "`hash"' oder "`Streuwert"', ein der Nachricht eindeutig zugeordneter Wert,
+der idealerweise (sonst k"onnen Unterschriften gef"alscht werden) m"oglichst kollisionsresistent ist,
+mathematisch unterschrieben.
+Auch hierbei werden zus"atzliche Bytes angef"ugt: erst \verb|00 01|, dann zuf"allig gew"ahlte, nicht genullte Bytes,
+\verb|00| und, zus"atzlich zum Format f"ur Verschl"usselung, eine den Hashalgorithmus identifizierende konstante Bytefolge.
+
+Die so erhaltene Unterschrift muss zus"atzlich zur Nachricht "ubertragen werden,
+da einerseits man sonst nicht die Nachricht bekommt, andererseits die Nachricht
+ben"otigt wird, um den Hashwert zu berechnen.
+
 \subsection{Meine Implementation}
 \begin{itemize}
 \item Schl"usselerstellung
