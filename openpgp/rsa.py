@@ -1,5 +1,6 @@
 """RSA PKCS #1"""
 import math
+import random
 import secrets
 import itertools
 
@@ -15,15 +16,14 @@ def find_prime(bitsize, secbits=256):
 
 
 def miller_rabin(n, k):
+    rnd = random.SystemRandom()
     r = n - 1
     s = 0
     while not r & 1:  # == not r % 2 (speed + ~25%)
         r >>= 1  # == r // 2  (speed + ~17%)
         s += 1
     for __ in range(k):
-        a = secrets.randbelow(n-1)
-        while a < 2:
-            a = secrets.randbelow(n-1)
+        a = rnd.randint(2, n-2)
         x = pow(a, r, n)
         if x in (1, n-1):
             continue
@@ -33,7 +33,7 @@ def miller_rabin(n, k):
                 return False
             if x == n-1:
                 break
-        if x != n - 1:
+        else:
             return False
     return True
 
