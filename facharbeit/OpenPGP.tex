@@ -15,8 +15,11 @@ language=Python,
 numbers=left,
 keepspaces=true,
 keywordstyle=\color{blue},
+morekeywords={assert},
 basicstyle=\footnotesize\ttfamily,
-numberstyle=\tiny\color{gray}
+numberstyle=\tiny\color{gray},
+title=\lstname,
+captionpos=b,
 }
 
 \newfloat{code-snip}{htbp}{what_is_this}
@@ -379,7 +382,25 @@ indem man zun"achst mit probabilistischen Tests
 wahrscheinliche Primzahlen findet und dann mit komplexeren Tests
 diese wenige Zahlen pr"uft~\cite{hac}.
 
-\todo{Auch erkl"aren, welchen ich verwende?}
+\subsubsection{Der Miller-Rabin-Test}
+Der Miller-Rabin-Test ist ein probabilistischer test, der "`nur"' beweisen kann,
+dass eine Zahl zusammengesetzt ist.
+Daf"ur wird die Tatsache verwendet, dass f"ur eine Primzahl $p = 2^s r+1$ und eine
+zu $p$ relativ prime ganze Zahl entweder $a^r \equiv 1 \mod p$ oder
+$a^{(2^j)r} \equiv -1 \mod p$ f"ur ein $j$ mit $0 \leq j \leq s-1$~\cite{hac}.
+
+Man pr"uft nun f"ur zuf"allig gew"ahlte $a$, ob eine der Kongruenzen gilt.
+Dabei kann wegen $a^{(2^j)r} = (a^r)^(2^j)$ w"ahrend der "Uberpr"ufung von
+$a^{(2^j)r} \equiv -1 \mod p$ der Initialwert $a^r$ bei Erh"ohung von $j$ einfach quadriert werden,
+sodass insgesamt weniger Rechnungen ben"otigt werden~\cite{hac}.
+Gilt keine der Kongruenzen, wird angenommen, dass die Zahl prim ist.
+F"ur eine ungerade zusammengesetzte Zahl $n$ gilt,
+dass maximal $\frac{1}{4}$ der Zahlen $a$ mit $2 \leq a \leq n-1$ die Kongruenzen nicht erf"ullen,
+d.h., dass f"alschlicherweise eine Primzahl angenommen wird.
+W"ahlt man $a$ zuf"allig, sinkt die Wahrscheinlichkeit, zusammengesetzte Zahlen als prim zu erkennen,
+mit jedem $a$ um Faktor $\frac{1}{4}$, also exponentiell.
+W"ahlt man $t$ Wiederholungen, betr"agt die Wahrscheinlichkeit, eine zusammengesetzte Zahl nicht als solche zu erkennen,
+$\left(\frac{1}{4}\right)^t = \frac{1}{2^{2t}}$~\cite{hac}.
 
 \subsection{Der PKCS\#1-Standard}
 % Warum man Padding benutzt. Entweder nur die f"ur OpenPGP benutzten Teile oder alles. Vielleicht auch nur die vorletzte Version.
@@ -412,13 +433,48 @@ da einerseits man sonst nicht die Nachricht bekommt, andererseits die Nachricht
 ben"otigt wird, um den Hashwert zu berechnen.
 
 \subsection{Meine Implementation}
-\begin{itemize}
-\item Schl"usselerstellung
-\item (vielleicht) \verb|pow(a, b, n)| selbst schreiben? Ist zwar etwas bl"od, aber AES habe ich ja auch selbst geschrieben.
-\item Zeigen, dass ein Grundlegener Ver-/Entschl"usselungs prozess buchst"ablich \verb|pow(text, *key)| ist
-\item (vielleicht) auf das Padding eingehen.
-\item Unterschriften
-\end{itemize}
+\subsubsection{Primzahlen}
+Zum Finden der ben"otigten Primzahlen verwende ich den Miller-Rabin-Algorithmus.
+
+Die Werte von $r$ und $s$ f"ur $n = 2^s r + 1$ finde ich, indem ich soweit wie m"oglich
+$n - 1$ fortlaufend durch zwei teile und einen Z"ahler erh"ohe.
+
+F"ur die Primzahlpr"ufung an sich verwende ich den Algorithmus wie in~\cite{hac} beschrieben.
+Dabei wende ich die bereits beschriebene Optimierung der einzelnen Quadratur pro Schritt an.
+Zu beachten ist, dass die Modulo-Funktion bzw.\@ der \lstinline{\%}-Operator
+die kleinste positive die entsprechende Kongruenz erf"ullende Zahl zur"uckgeben,
+weshalb die Tests $z \equiv -1 \mod n$ als \lstinline{z \% n == n-1} geschrieben werden m"ussen.
+
+Als Wiederholungszahl habe ich 128 festgelegt.
+So ist die Wahrscheinlichkeit, dass eine zusammengesetzte Zahl als prim erkl"art wird,
+$\frac{1}{2^{256}}$, was der Wahrscheinlichkit entspricht, einen AES-256%
+\footnote{Der symmetrische Algorithmus, der u.a.\@ von den USA f"ur streng geheime Informationen verwendet wird}%
+-Schl"ussel beim ersten Versuch zu erraten.
+
+\todo{Quellcode hier einf"ugen?}
+
+\subsubsection{Schl"usselerstellung}
+Mit gefundenen Primzahlen erstelle ich "uber die im mathematischen Teil genannten Schritte
+dann den "offentlichen und privaten Schl"ussel.
+Auch hier muss auf negative Werte (als Ergebnis des erweiterten Euklidschen Algorithmus)
+achtgegeben werden: Um einen postiven Wert f"ur $d$ zu erhalten, der die ben"otigte Kongruenz
+$ed \equiv 1 \mod \phi(n)$ erf"ullt, kann hier die Modulufunktion bzw.\@ der \verb|%|-Operator
+verwendet werden.
+Dabei lege ich f"ur $e$ 65537 fest.
+Die Berechnung von $\phi(n)$ ist ebenfalls direkt als $n - p - q + 1$ implementiert.
+
+\subsubsection{Ver- und Entschl"usselung, Unterschriften}
+Der grundlegene Ver- und Entschl"usseldungsprozess ist buchst"ablich:
+\lstinputlisting[firstnumber=57,firstline=57,lastline=59]{../openpgp/rsa.py}
+Da in jeder Verwendung Bytes verwendet werden, habe ich daf"ur eine die Konvertierung
+durchf"uhrende Wrapperfunktion, \lstinline{crypt_bytes}, geschrieben.
+
+F"ur Ver- und Entschl"usselung habe ich die entsprechenden En- und Dekodierungsverfahren
+aus dem Standard implementiert.
+Die Unterschriften (sowohl Erstellung als auch Verifizierung) nahmen direkt den
+pr"akixierten Hash als Parameter.
+Bei den Unterschriften ist anzumerken, dass es nur eine Enkodierung gibt,
+da bei der Verifikation der entschl"usselte Wert mit dem kodierten Hash verglichen wird.
 
 \section{OpenPGP}
 \subsection{"Ubersicht}

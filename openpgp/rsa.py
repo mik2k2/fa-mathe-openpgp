@@ -48,8 +48,7 @@ def generate_key(mod_bits):
     assert e < phi_n
     gcd, d, __ = extended_euclid(e, phi_n)
     assert gcd == 1
-    if d < 0:
-        d += phi_n
+    d %= phi_n
     assert d*e % phi_n == 1
 
     return (d, n), (e, n)
