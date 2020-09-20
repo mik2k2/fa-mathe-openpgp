@@ -535,10 +535,59 @@ verschl"usselten Daten, welches aus Packets f"ur die Datei und die Unterschrift
 besteht, enthalten. \todo{Bild?}
 
 \subsection{Meine Implementation}
-Was habe ich implementiert? Auf die hybride Krypto eingehen (AES als Unterpunkt?). Wenn erlaubt/noch Seiten "ubrig, auch auf Datenstrukturen eingehen (die wohl eher Richtung Mathe gehen als Packet-Format lesen usw.)
-Wahrscheinlich auch viel aus dem OpenPGP-Standard zitieren.
+%Was habe ich implementiert? Auf die hybride Krypto eingehen (AES als Unterpunkt?). Wenn erlaubt/noch Seiten "ubrig, auch auf Datenstrukturen eingehen (die wohl eher Richtung Mathe gehen als Packet-Format lesen usw.)
+%Wahrscheinlich auch viel aus dem OpenPGP-Standard zitieren.
+
+Meine OpenPGP-Teilimplementation umfasst:
+\begin{itemize}
+    \item Einlesen von verschl"usselten Daten (optional mit Modifikationserkennung)
+    \item Einlesen von "offentlichen und privaten Schl"usseln (ohne symmetrische Verschl"usselung privater Schl"ussel)
+    \item Verifizieren von Unterschriften "uber Daten, User IDs und Unterschl"ussel (nur RSA mit der SHA-Familie)
+    \item Erstellen von Unterschriften (nur RSA mit der SHA-Familie "uber Daten)
+    \item Verschl"usseln von Daten (nur asymmetrisch mit RSA, symmetrisch mit der AES-Familie, nicht mit Passwort)
+\end{itemize}
+
+Intern werden die vielen m"oglichen OpenPGP-Packets in die drei Hauptentit"aten
+Schl"ussel, Nachricht (oder Datei) und Unterschrift zusammengefasst,
+wobei Unterschriften immer Schl"usseln oder Nachrichten zugeordnet werden.
+Aus dieser Darstellung werden dann je nach dem, was gemacht werden soll,
+neue Nachrichten, Unterschriften oder verschl"usselte Packets erstellt,
+die dann ausgegeben werden.
+
+\todo{Mehr schreiben}
+
 \subsection{Beispiele}
-Es funktioniert wirklich!
+Alle der folgenden Beispiele beginnen mit einer Shell-Zeile, die mit \verb|$| beginnt,
+und zeigen danach die jeweiligen Ausgaben.
+Im Anhang wird erl"autert, wie sich die Beispiele reproduzieren lassen
+(mit anderen Schl"usselfingerabdr"ucken).
+
+\lstset{
+breaklines,
+basicstyle=\footnotesize\ttfamily,
+}
+
+\paragraph{Infos zu geladenen Daten}~
+\begin{lstlisting}
+$ python3 -m openpgp info
+2020-09-20 14:56:46,804 - WARNING(openpgp.signature): unknown signing key f7c5ca02d089077b3536760b42dc1e50d31108cb
+Keys:
+------------------------------
+Key Pair 4e339f0639d483e03fd4dd7b22f24394feb09179
+        UID 'Testing Key 1 <testkey-1-openpgp-fa-mathe-sgb@mikitsu.me>'
+                GENERIC_UID signature (RSA/SHA256) by b91294876bd058ff9abce9809ad2041a28dc342d, created 2020-08-22 19:21:28, exportable, revocable
+                POSITIVE_UID signature (RSA/SHA256) by 4e339f0639d483e03fd4dd7b22f24394feb09179, created 2020-08-22 19:21:27, exportable, revocable
+        UID 'Alternative UID <testkey-1-alt-uid-openpgp-fa-mathe-sgb@mikitsu.me>'
+                POSITIVE_UID signature (RSA/SHA256) by 4e339f0639d483e03fd4dd7b22f24394feb09179, created 2020-08-22 19:21:28, exportable, revocable
+        Key Pair ab81c14d62c5f29ace16d1f61fca78e3f66150ec
+                SUBKEY_BIND signature (RSA/SHA256) by 4e339f0639d483e03fd4dd7b22f24394feb09179, created 2020-08-22 19:21:27, exportable, revocable
+Public Key b91294876bd058ff9abce9809ad2041a28dc342d
+        UID 'Testing Key 2 <testkey-2-openpgp-fa-mathe-sgb@mikitsu.me>'
+                GENERIC_UID signature (RSA/SHA256) by 4e339f0639d483e03fd4dd7b22f24394feb09179, created 2020-08-22 19:21:28, exportable, revocable
+                POSITIVE_UID signature (RSA/SHA256) by b91294876bd058ff9abce9809ad2041a28dc342d, created 2020-08-22 19:21:27, exportable, revocable
+        Public Key 0bca1709a0c297a5fa8e8e6850587fe80adf2136
+                SUBKEY_BIND signature (RSA/SHA256) by b91294876bd058ff9abce9809ad2041a28dc342d, created 2020-08-22 19:21:27, exportable, revocable
+\end{lstlisting}
 
 \section{Ausleitung}
 Facharbeitshinweise:
