@@ -1,6 +1,7 @@
 __pycache__
 data
 .idea
+.env
 pii.tex
 *.synctex.gz
 *.aux
