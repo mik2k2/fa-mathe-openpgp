@@ -130,23 +130,23 @@ der nat"urlichen Zahlen kleiner gleich $n$, die relativ prim zu $n$ sind, zu.
 F"ur eine Primzahl $p$ ist trivialerweise $\phi(p) = p-1$,
 da jede nat"urliche Zahl unter $p$ per Definition keine Faktoren bis auf $1$ mit $p$ teilt.
 F"ur ein Produkt zweier Primzahlen $p$ und $q$ ist nach Euler
-$\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$~\cite{euler63}.
+$\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$~\cite{euler63}. \todo{Name f"ur die Gleichung?}
 
 \subsubsection{Der erweiterte Euklidsche Algorithmus}
 Der einfache Euklidsche Algorithmus kann zur Berechnung des gr"o"sten gemeinsamen
-Teilers zweier Zahlen $a, b$ verwendet werden.
+Teilers zweier Zahlen $a_0, b_0$ verwendet werden.
 Speichert man einige weitere Zahlen, erh"alt man auch zwei ganze Zahlen $s, t$, sodass
-$sa + tb = ggt(a, b)$~\cite{taocp2}.
+$sa_0 + tb_0 = \textrm{ggt}(a, b)$~\cite{taocp2}. \todo{Name f"ur die Gleichung?}
 
 Der Algorithmus selbst besteht (bei geeigneter Z"ahlweise) aus drei Schritten.
 Eingaben sind zwei nat"urliche Zahlen $a_0 > b_0$~\cite{taocp2}:
 \begin{enumerate}
     \item Setze $s_1 \gets 1$, $s_2 \gets 0$, $t_1 \gets 0$, $t_2 \gets 1$, $a \gets a_0$, $b \gets b_0$
-    \item Falls $b = 0$: Beende, der GGT ist $a$ und $s_1 a_0 + t_1 b_0 = a$
+    \item Falls $b = 0$: Beende, es gilt: $\textrm{ggt}(a_b, b_0) = a = s_1 a_0 + t_1 b_0$
     \item Berechne $q = \floor{\frac{a}{b}}$ und setze zeitgleich:
     \begin{itemize}
         \item $a \gets b$, $b \gets a - bq$
-        \item $s_1 \gets t_2$, $s_2 \gets s_1 - s_2 q$
+        \item $s_1 \gets s_2$, $s_2 \gets s_1 - s_2 q$
         \item $t_1 \gets t_2$, $t_2 \gets t_1 - t_2 q$
     \end{itemize}
 \end{enumerate}\cite{taocp2}
@@ -154,7 +154,7 @@ Eingaben sind zwei nat"urliche Zahlen $a_0 > b_0$~\cite{taocp2}:
 \paragraph{Beispiel nach~\cite{taocp2}}\todo{Lieber eigenes Beispiel?}
 ~\\
 Mit $a_0 = 40902$ und $b_0 = 24140$.
-Dargestellt ist jeweils der Stand nach Ausf"uhrung des zweiten Schritts.
+Dargestellt ist jeweils der Stand nach Ausf"uhrung des zweiten Schritts.\\
 
 \begin{tabular}{c|c c c c c c c l}
     Iteration-Nr. & $q$ & $s_1$ & $t_1$ & $a$ & $s_2$ & $t_2$ & $b$ \\
@@ -171,7 +171,7 @@ Dargestellt ist jeweils der Stand nach Ausf"uhrung des zweiten Schritts.
 \end{tabular}
 ~\\~\\
 \noindent
-Tats"achlich ist $337 \cdot 40902 - 571 \cdot 24140 = 34 = ggt(40902, 24140)$~\cite{taocp2}.
+Tats"achlich ist $337 \cdot 40902 - 571 \cdot 24140 = 34 = \textrm{ggt}(40902, 24140)$~\cite{taocp2}.
 
 \paragraph{Verwendbarkeit f"ur RSA}
 
@@ -184,10 +184,10 @@ Somit gilt f"ur die beiden weiteren vom Algorithmus ausgegebenen Zahlen $s, t$, 
 \[\begin{aligned}
       &ed &\equiv&~1 \mod \phi(n)& \\
       \iff&ed &=&~1 + k \phi(n) &\textrm{f"ur ein }k \in \mathbb{Z}\\
-      &&=&~xe + y\phi(n) + k\phi(n)& \\
-      &&=&~xe + (y+k)\phi(n) &\\
-      \iff& ed &\equiv&~xe \mod \phi(n) &\textrm{da }y+k\textrm{ eine ganze Zahl ist}\\
-      \iff& d &\equiv&~x \mod \phi(n)
+      &&=&~se + t\phi(n) + k\phi(n)& \\
+      &&=&~se + (t+k)\phi(n) &\\
+      \iff& ed &\equiv&~se \mod \phi(n) &\textrm{da }t+k\textrm{ eine ganze Zahl ist}\\
+      \iff& d &\equiv&~s \mod \phi(n)
   \end{aligned}
 \]
 
@@ -197,11 +197,11 @@ F"ur die Ver- und Entschl"usselungsfunktionen gilt~\cite{rsa}:
 \[
 \begin{aligned}
 E(m) = m^e \mod n \\
-D(c) = m^d \mod n
+D(c) = c^d \mod n
 \end{aligned}
 \]
 
-Die G"ultigkeit dieser Funktionen wird nun erl"autert. \todo{So oder and\-ers\-her\-um?}
+Die G"ultigkeit dieser Funktionen wird nun erl"autert.
 
 Nach Euler gilt $a^{b-1} \equiv 1 \mod b$ f"ur alle $b \in \mathbb{P}$ und $a \in \mathbb{N}$,
 wenn $a$ nicht durch $b$ teilbar ist, also $a \not\equiv 0 \mod b$~\cite{euler41}.
@@ -212,7 +212,7 @@ gilt offensichtlich $a^{p-1} \equiv 1 \mod p$
 Setzt man f"ur $a$ den Wert $m^{k \cdot (q-1)}$ ein,
 wobei $k$ eine folgend n"aher bestimmte nat"urliche Zahl, $q$ der zweite Faktor von $n$
 und $m$ eine die Nachricht darstellende nat"urliche Zahl ist,
-erh"alt man f"ur die linke Seite der Kongruenz~\cite{rsa}:
+erh"alt man f"ur die linke Seite der Kongruenz~\cite{rsa}: \todo{vertikal?}
 \[
     m \cdot \left(m^{k(q-1)}\right)^{p-1} = m \cdot m^{k(q-1)(p-1)} = m \cdot m^{k\phi(n)} = m^{k\phi(n) + 1}
 \]
@@ -223,9 +223,9 @@ Diese Kongruenz gilt weiterhin nur f"ur $m^{k(q-1)} \not\equiv 0 \mod p$.
 Wenn $m^{k(q-1)} \equiv 0 \mod p$, ist $p$ Teiler von $m^{k(q-1)}$.
 Da $m^{k(q-1)}$ nicht mehr verschiedene Faktoren als $m$ hat und $p$ als Primzahl
 genua einen Primfaktor hat, teilt $p$ auch $m$.
-Als Kongruenz gescgrieben hei"st das: $m \equiv 0 \mod p$.
+Als Kongruenz geschrieben hei"st das: $m \equiv 0 \mod p$.
 Es gilt also $m^{k(q-1)} \equiv 0 \equiv m \mod p$.
-Somit gilt $m^{k\phi(n)+1} \equiv m \mod p$ f"ur alle $m \in \mathbb{N}$~\cite{rsa}.\todo{So OK?}
+Somit gilt $m^{k\phi(n)+1} \equiv m \mod p$ f"ur alle $m \in \mathbb{N}$~\cite{rsa}.
 
 Da aus $ed \equiv 1 \mod \phi(n)$ folgt, dass $ed = k\phi(n) +1$ f"ur ein $k \in \mathbb{N}$,%
 \footnote{Da $e, d$ und $\phi(n)$ nat"urliche Zahlen sind, ist $k$ in diesem Fall auch nat"urlich}
@@ -277,7 +277,7 @@ jedoch wurden keine ausreichender Gr"o"se gebaut}~\cite{rsa}. \todo{Reichen die 
 
 Die Berechnung von $\phi(n)$, ohne "uber die Faktoren zu gehen,
 kann wie folgt in Kenntnis von $p$ und $q$ umgewandelt werden, sodass die Berechnung von $\phi(n)$
-und die Faktorisierung $n$s \todo{Besser aussehen lassen} "aquivalent sind:
+und die Faktorisierung von $n$ "aquivalent sind:
 
 Kennt man $\phi(n)$, kann man "uber $\phi(n) = (p-1)(q-1) = n - (p+q) + 1$
 die Summe $p+q$ berechnen.
@@ -303,7 +303,8 @@ Dies ist jedoch nur das leichteste Problem, wenn RSA praktisch implementiert wer
 \subsection{Effiziente Berechnung von $a^b \mod n$}
 % Sonst w"are das alles viel zu langsam.
 
-Da man sowohl zum Ver- als auch zum Entschl"usseln $a^b \mod n$ berechnen muss,
+Da man sowohl zum Ver- als auch zum Entschl"usseln $a^b \mod n$
+(jeweils mit Basis $m$ oder $c$ und Exponent $e$ oder $d$) berechnen muss,
 jedoch die jeweiligen Exponenten ($e$, $d$) in den allermeisten F"allen
 in der Gr"o"senordnung von mindestens f"unf Stellen liegen
 (der meistgenutzte "offentliche Exponent ist 65537%
@@ -319,7 +320,7 @@ Nat"urlich ist auch beides gleichzeitig m"oglich~\cite{hac}.
 Ein allgemeiner Ansatz, Exponentiation zu verschnellern, ist sog.\@
 "`repeated square and multiply"' ("`wiederholtes Quadrieren und Multiplizieren"').
 In der einfachsten Form werden dabei alle $a^{(2^i)}$ multipliziert,
-f"ur die das $i$te Bit in der binaren Darstellung von $b$ gleich $1$ ist.
+f"ur die das Bit an der STelle $i$ in der binaren Darstellung von $b$ gleich $1$ ist.
 Da man die Werte $a^{(2^i)}$ erhalten kann, indem man in jedem Schritt $a$ quadriert,
 und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.\@ Quellcodeausschnitt~\ref{code:square-and-multiply})
 wird hier wiederholt quadriert und multipliziert.
@@ -360,12 +361,14 @@ Um Schl"ussel zu generieren, braucht man zun"achst Primzahlen.
 Um diese Primzahlen zu erhalten, ist es aufgrund der Gr"o"se
 (ab ca.\@ 1024 bits bzw.\@ 308 Ziffern)
 inpraktikabel (darauf beruht die Sicherheit), alle Primzahlen zu finden.
-Daher sieht die Prozedur zur Primzahlengeneration wie folgt aus~\cite{hac}: \todo{Fast 1 zu 1 "ubersetzt. Anders formatieren?}
+Daher sieht die Prozedur zur Primzahlengeneration wie folgt aus~\cite{hac}:
+\begin{quote}
 \begin{itemize}
     \item Zuf"allige Zahl der gew"unschten Gr"o"se generieren
     \item Pr"ufen, ob die Zahl prim ist
     \item Fortfahren, bis eine Primzahl gefunden wurde
 \end{itemize}
+\end{quote}
 
 Zur Pr"ufung einer Primzahl existieren viele verschiedene Algorithmen.
 Sie lassen sich grob in zwei Gruppen einteilen:
