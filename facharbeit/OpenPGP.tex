@@ -390,7 +390,7 @@ zu $p$ relativ prime ganze Zahl entweder $a^r \equiv 1 \mod p$ oder
 $a^{(2^j)r} \equiv -1 \mod p$ f"ur ein $j$ mit $0 \leq j \leq s-1$~\cite{hac}.
 
 Man pr"uft nun f"ur zuf"allig gew"ahlte $a$, ob eine der Kongruenzen gilt.
-Dabei kann wegen $a^{(2^j)r} = (a^r)^(2^j)$ w"ahrend der "Uberpr"ufung von
+Dabei kann wegen $a^{(2^j)r} = (a^r)^{(2^j)}$ w"ahrend der "Uberpr"ufung von
 $a^{(2^j)r} \equiv -1 \mod p$ der Initialwert $a^r$ bei Erh"ohung von $j$ einfach quadriert werden,
 sodass insgesamt weniger Rechnungen ben"otigt werden~\cite{hac}.
 Gilt keine der Kongruenzen, wird angenommen, dass die Zahl prim ist.
@@ -441,9 +441,9 @@ $n - 1$ fortlaufend durch zwei teile und einen Z"ahler erh"ohe.
 
 F"ur die Primzahlpr"ufung an sich verwende ich den Algorithmus wie in~\cite{hac} beschrieben.
 Dabei wende ich die bereits beschriebene Optimierung der einzelnen Quadratur pro Schritt an.
-Zu beachten ist, dass die Modulo-Funktion bzw.\@ der \lstinline{\%}-Operator
+Zu beachten ist, dass die Modulo-Funktion bzw.\@ der \verb|%|-Operator
 die kleinste positive die entsprechende Kongruenz erf"ullende Zahl zur"uckgeben,
-weshalb die Tests $z \equiv -1 \mod n$ als \lstinline{z \% n == n-1} geschrieben werden m"ussen.
+weshalb die Tests $z \equiv -1 \mod n$ als \verb|z % n == n-1| geschrieben werden m"ussen.
 
 Als Wiederholungszahl habe ich 128 festgelegt.
 So ist die Wahrscheinlichkeit, dass eine zusammengesetzte Zahl als prim erkl"art wird,
