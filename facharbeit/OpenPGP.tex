@@ -136,14 +136,14 @@ $\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)$~\cite{euler63}. \todo{Name f"ur 
 Der einfache Euklidsche Algorithmus kann zur Berechnung des gr"o"sten gemeinsamen
 Teilers zweier Zahlen $a_0, b_0$ verwendet werden.
 Speichert man einige weitere Zahlen, erh"alt man auch zwei ganze Zahlen $s, t$, sodass
-$sa_0 + tb_0 = \textrm{ggt}(a, b)$~\cite{taocp2}. \todo{Name f"ur die Gleichung?}
+$sa_0 + tb_0 = \textrm{ggt}(a_0, b_0)$~\cite{taocp2}. \todo{Name f"ur die Gleichung?}
 
 Der Algorithmus selbst besteht (bei geeigneter Z"ahlweise) aus drei Schritten.
 Eingaben sind zwei nat"urliche Zahlen $a_0 > b_0$~\cite{taocp2}:
 \begin{enumerate}
     \item Setze $s_1 \gets 1$, $s_2 \gets 0$, $t_1 \gets 0$, $t_2 \gets 1$, $a \gets a_0$, $b \gets b_0$
-    \item Falls $b = 0$: Beende, es gilt: $\textrm{ggt}(a_b, b_0) = a = s_1 a_0 + t_1 b_0$
-    \item Berechne $q = \floor{\frac{a}{b}}$ und setze zeitgleich:
+    \item Falls $b = 0$: Beende, es gilt: $\textrm{ggt}(a_0, b_0) = a = s_1 a_0 + t_1 b_0$
+    \item Berechne die Ganzzahldivision $q = \floor{\frac{a}{b}}$ und setze zeitgleich:
     \begin{itemize}
         \item $a \gets b$, $b \gets a - bq$
         \item $s_1 \gets s_2$, $s_2 \gets s_1 - s_2 q$
@@ -151,7 +151,7 @@ Eingaben sind zwei nat"urliche Zahlen $a_0 > b_0$~\cite{taocp2}:
     \end{itemize}
 \end{enumerate}\cite{taocp2}
 
-\paragraph{Beispiel nach~\cite{taocp2}}\todo{Lieber eigenes Beispiel?}
+\paragraph{Beispiel nach~\cite{taocp2}}
 ~\\
 Mit $a_0 = 40902$ und $b_0 = 24140$.
 Dargestellt ist jeweils der Stand nach Ausf"uhrung des zweiten Schritts.\\
@@ -180,7 +180,7 @@ kann der erweiterte Euklidsche Algorithmus auf $e$ und $\phi(n)$ angewandt werde
 Weil $\phi(n)$ und $e$ wie oben gezeigt relativ prim zueinander sind, ist ihr GGT gleich eins.
 Somit gilt f"ur die beiden weiteren vom Algorithmus ausgegebenen Zahlen $s, t$, dass $se + t\phi(n) = 1$.
 
-\noindent Mit diesen Grundagen k"onnen die folgenden "Aquivalenzen aufgestellt werden:
+\noindent Mit diesen Grundlagen k"onnen die folgenden "Aquivalenzen aufgestellt werden:
 \[\begin{aligned}
       &ed &\equiv&~1 \mod \phi(n)& \\
       \iff&ed &=&~1 + k \phi(n) &\textrm{f"ur ein }k \in \mathbb{Z}\\
@@ -190,6 +190,8 @@ Somit gilt f"ur die beiden weiteren vom Algorithmus ausgegebenen Zahlen $s, t$, 
       \iff& d &\equiv&~s \mod \phi(n)
   \end{aligned}
 \]
+
+\todo{Prozess}
 
 \subsection{Ver-/Entschl"usselungsprozess}
 % Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
@@ -246,7 +248,7 @@ ap + m = m^{ed} \land ~~~ bq + m = m^{ed} \\
 Da $p$ und $q$ als Primzahlen keine Faktoren teilen, folgt aus $ap = bq$,
 dass $a$ durch $q$ teilbar ist und $b$ durch $p$ teilbar ist.
 Setzt man $c = \frac{a}{q} = \frac{b}{p}$ ($c \in \mathbb{N}$),
-sieht man, dass $cn = m^{ed} - m$~\cite{pii1}.
+sieht man, dass $cn = m^{ed} - m$~\cite{pii1}.\todo{warum}
 Schreibt man diese Gleichung als Kongruenz, erh"alt man:
 
 \[
@@ -269,15 +271,21 @@ Inhaber des privaten Schl"ussels verschickt wurde.
 
 \subsection{Sicherheit}
 
-Kennt man die Faktoren $p$ und $q$, kann man leicht $\phi(n)$ und somit auch $d$ berechnen.
+\todo{Einf"ugen}
+- Wir sind Angreifer; d ist ziel, man braucht e + phi n, e bekannt.
+- Bestimmen von p q mit faktor von n
+- gr"o"se von n: mindestens 700 stellen
+- k"onnte man phi n berechnen, h"atte man p, q => widerspruch
+
+Kennt man die Faktoren $p$ und $q$, kann man leicht\todo{ref} $\phi(n)$ und somit auch $d$ berechnen.
 Die Faktorisierung wird jedoch schon seit Jahrtausenden untersucht,
 ohne dass eine effiziente Methode gefunden wurde%
 \footnote{f"ur Quantencomputer existieren effiziente Algorithmen,
-jedoch wurden keine ausreichender Gr"o"se gebaut}~\cite{rsa}. \todo{Reichen die Beispiele hier?}
+jedoch wurden keine ausreichender Gr"o"se gebaut}~\cite{rsa}.
 
 Die Berechnung von $\phi(n)$, ohne "uber die Faktoren zu gehen,
 kann wie folgt in Kenntnis von $p$ und $q$ umgewandelt werden, sodass die Berechnung von $\phi(n)$
-und die Faktorisierung von $n$ "aquivalent sind:
+und die Faktorisierung von $n$ "aquivalent sind:\todo{"`Aufwand"'}
 
 Kennt man $\phi(n)$, kann man "uber $\phi(n) = (p-1)(q-1) = n - (p+q) + 1$
 die Summe $p+q$ berechnen.
@@ -289,7 +297,8 @@ Trotz der "Aquivalenz zur Faktorisierung in diesem (und einigen weiteren,
 hier nicht aufgef"uhrten F"allen, die in~\cite{rsa} genannt werden),
 ist nicht automatisch jede Methode, die RSA bricht, eine M"oglichkeit
 zur Faktorisierung~\cite{sinews}.
-\todo{Die Quelle bezieht sich auf doi:10.1.1.73.7840, lieber direkt zitieren?}
+
+\todo{Beispiel komplett}
 
 \section{RSA praktisch implementieren}
 % Bytes kann man einfach in Zahlen umwandeln, aber es geh"ort noch etwas mehr dazu
@@ -298,7 +307,6 @@ Ein offensichtlicher Unterschied zwischen den mathematischen Funktionen,
 die RSA ausmachen, und praktischer Anwending ist, dass man praktisch entweder Dateien
 oder Text und nicht Zahlen verschl"usseln will.
 Dies ist jedoch nur das leichteste Problem, wenn RSA praktisch implementiert werden soll.
-\todo{Mehr intro?}
 
 \subsection{Effiziente Berechnung von $a^b \mod n$}
 % Sonst w"are das alles viel zu langsam.
@@ -307,9 +315,9 @@ Da man sowohl zum Ver- als auch zum Entschl"usseln $a^b \mod n$
 (jeweils mit Basis $m$ oder $c$ und Exponent $e$ oder $d$) berechnen muss,
 jedoch die jeweiligen Exponenten ($e$, $d$) in den allermeisten F"allen
 in der Gr"o"senordnung von mindestens f"unf Stellen liegen
-(der meistgenutzte "offentliche Exponent ist 65537%
-\footnote{In GnuPG und OpenSSl Defaultwert,
-und in \emph{jedem} RSA-Zertifikat, welches ich gesehen habe}),
+(der meistgenutzte\footnote{In GnuPG und OpenSSl Defaultwert,
+und in \emph{jedem} RSA-Zertifikat, welches ich gesehen habe}
+"offentliche Exponent ist 65537),
 ist es notwendig, modulare Exponentiation zu optimieren,
 damit Ver- und Entschl"usselung praktikabel wird.
 
@@ -320,7 +328,7 @@ Nat"urlich ist auch beides gleichzeitig m"oglich~\cite{hac}.
 Ein allgemeiner Ansatz, Exponentiation zu verschnellern, ist sog.\@
 "`repeated square and multiply"' ("`wiederholtes Quadrieren und Multiplizieren"').
 In der einfachsten Form werden dabei alle $a^{(2^i)}$ multipliziert,
-f"ur die das Bit an der STelle $i$ in der binaren Darstellung von $b$ gleich $1$ ist.
+f"ur die das Bit an der Stelle $i$ (\todo{0, rechts->links})in der bin"aren Darstellung von $b$ gleich $1$ ist.
 Da man die Werte $a^{(2^i)}$ erhalten kann, indem man in jedem Schritt $a$ quadriert,
 und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.\@ Quellcodeausschnitt~\ref{code:square-and-multiply})
 wird hier wiederholt quadriert und multipliziert.
@@ -328,11 +336,13 @@ Von diesem grundlegenen Algorithmus existieren Abwandlungen,
 die durch noch weniger Multiplikationen mehr Effizienz erreichen.
 Diese beschreibe ich allerdings nicht hier~\cite{hac}. \todo{Anhang?}
 
+\todo{Beispiel}
+
 \begin{code-snip}
 \begin{lstlisting}
 def square_and_multiply_simple(a, b):
     ergebnis = 1
-    for i in range(x.bit_length()):
+    for i in range(b.bit_length()):
         if 1 & b:
             ergebnis *= a
         a **= 2
@@ -342,16 +352,11 @@ def square_and_multiply_simple(a, b):
 \caption{Implementation eines simplen square-and-multiply-Algorithmus nach~\cite{hac}}
 \label{code:square-and-multiply}
 \end{code-snip}
-
+\todo{Kommentare}
 Baut man die modulare Reduktion in die Multiplikation ein,
 bleiben die zu multiplizierenden Zahlen klein, sodass die einzelnen
 Multiplikationen schneller werden.
-Auch hier existiert eine optimierte Variante, die sog.\@ "`Montgomery-Reduktion"'.
-Dabei wird f"ur zwei ganze relativ prime Zahlen $m$ und $r$ sowie eine ganze Zahl $t$ mit $0 \leq t \le mr$
-die kleinste nat"urliche Zahl, die kongruent zu $tr^{-1} \mod m$ ist, berechnet.
-Dies kann bei man geschickter Wahl der zu multiplizierenden Zahlen
-bei optimierten square-and-multiply-Algorithmen einsetzen.
-\todo{Genau wie? Braucht aber ltr-algo}
+Auch hier existiert eine optimierte Variante, die sog.\@ "`Montgomery-Reduktion"'~\cite{hac}.
 
 In Python ist eine optimierte modulare Exponentiation als \lstinline{pow(a, b, n)} eingebaut.
 
