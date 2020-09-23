@@ -110,20 +110,21 @@ wobei $\phi$ die eulersche Phi-Funktion darstellt, die nachfolgend n"aher erl"au
 Damit diese Kongruenz gelten kann, m"ussen $e$ und $d$ relativ prim zu $\phi(n)$ sein.
 Dies kann mittels des Widerspruchsbeweises gezeigt werden:
 Wenn $d$ (analog f"ur $e$) einen gemeinsamen Faktor $f > 1 \in \mathbb{N}$ mit $\phi(n)$ teilte, m"usste Folgendes gelten:
-\[
+\begin{equation}
+\label{eq:ed_prime_phi_n}
 \begin{aligned}
 &d = fa ~~;~~ \phi(n) = fb && \textrm{ mit } a, b \in \mathbb{N} \\
 &efa \equiv 1 \mod fb \\
 &efa = kfb + 1 && \textrm{f"ur ein bestimmtes } k \in \mathbb{N} \\
 &ea = kb + \frac{1}{f} & \lightning &
 \end{aligned}
-\]
+\end{equation}
 Da $ea$ und $kb$ als Produkte nat"urlicher Zahlen ebenfalls nat"urliche Zahlen sind, $\frac{1}{f}$ jedoch nicht, kommt es zum Widerspruch.
 Somit sind $e$ und $d$ relativ prim zu $\phi(n)$.
 
 Um ein Zahlenpaar zu finden, welches diese Eigenschaften hat,
-ist es am einfachsten, einen geeigneten Wert f"ur $e$ festzulegen (z.B.\@ 65537)
-und dann mittels des erweiterten Euklidschen Algorithmus (s.~unten) $d$ zu berechnen.
+ist es am einfachsten, einen geeigneten Wert f"ur $e$ auszusuchen (siehe dazu~\ref{subsec:practical:exp})
+und dann mittels des erweiterten Euklidschen Algorithmus (siehe~\ref{subsubsec:math:euclid}) $d$ zu berechnen.
 
 \subsubsection{Die eulersche Phi-Funktion}
 Die eulersche Phi-Funktion $\phi(n)$ ordnet einer nat"urlichen Zahl $n$ die Anzahl
@@ -134,6 +135,7 @@ F"ur ein Produkt zweier Primzahlen $p$ und $q$ ist nach Euler~\cite{euler63}:
 \begin{equation}\label{eq:phi_calc}\phi(pq) = \phi(p) \cdot \phi(q) = (p-1)(q-1)\end{equation}
 
 \subsubsection{Der erweiterte Euklidsche Algorithmus}
+\label{subsubsec:math:euclid}
 Der einfache Euklidsche Algorithmus kann zur Berechnung des gr"o"sten gemeinsamen
 Teilers zweier Zahlen $a_0, b_0$ verwendet werden.
 Speichert man einige weitere Zahlen, erh"alt man auch zwei ganze Zahlen $s, t$, sodass~\cite{taocp2}:
@@ -178,20 +180,22 @@ Tats"achlich ist $337 \cdot 40902 - 571 \cdot 24140 = 34 = \textrm{ggt}(40902, 2
 
 Um ein $d$ zu bestimmen, wenn $ed \equiv 1 \mod \phi(n) $ und $e$ sowie $\phi(n)$ bekannt (bzw.\@ gew"ahlt) sind,
 kann der erweiterte Euklidsche Algorithmus auf $e$ und $\phi(n)$ angewandt werden.
-Weil $\phi(n)$ und $e$ wie oben gezeigt relativ prim zueinander sind, ist ihr GGT gleich eins.
+Weil $\phi(n)$ und $e$ wie im Widerspruch~\eqref{eq:ed_prime_phi_n} gezeigt relativ prim zueinander sind, ist ihr GGT gleich eins.
 Somit gilt nach~\eqref{eq:euclid} f"ur die beiden weiteren vom Algorithmus ausgegebenen Zahlen $s_1, t_1$,
 im Folgenden nur $s$ und $t$, dass $se + t\phi(n) = 1$.
 
 \noindent Mit diesen Grundlagen k"onnen die folgenden "Aquivalenzen aufgestellt werden:
-\[\begin{aligned}
+\begin{equation}
+\label{eq:d_is_s}
+\begin{aligned}
       &ed &\equiv&~1 \mod \phi(n)& \\
       \iff&ed &=&~1 + k \phi(n) &\textrm{f"ur ein }k \in \mathbb{Z}\\
       &&=&~se + t\phi(n) + k\phi(n)& \\
       &&=&~se + (t+k)\phi(n) &\\
       \iff& ed &\equiv&~se \mod \phi(n) &\textrm{da }t+k\textrm{ eine ganze Zahl ist}\\
       \iff& d &\equiv&~s \mod \phi(n)
-  \end{aligned}
-\]
+\end{aligned}
+\end{equation}
 
 \subsubsection{Zusammenfassung}
 
@@ -341,13 +345,14 @@ Mittels des erweiterten Euklidschen Algorithmus erhalten wir:\\
 \end{tabular}
 ~\\~\\
 \noindent
-Der GGT ist tats"achlich 1, d.h.\@ $e$ und $\phi(n)$ sind relativ prim, wie notwendig.
-Den Wert f"ur $d$ erhalten wir mit $s_1$, $d = s_1 = 89$.
+Der GGT ist tats"achlich 1, d.h.\@ $e$ und $\phi(n)$ sind teilerfremd, wie nach~\eqref{eq:ed_prime_phi_n} notwendig.
+Den Wert f"ur $d$ erhalten wir nach~\eqref{eq:d_is_s}: $d = s_1 = 89$.
 Somit sind beide Schl"ussel bestimmt: der "offentliche ist $(e, n) = (17, 1591)$, der private $(d, n) = (89, 1591)$.
 
-Mit diesen Schl"usseln k"onnen wir nun eine Nachricht verschl"usseln.
-Ist die Nachricht $m = 42$, dann ist die verschl"usselte Version $c = E(m) = m^e \mod n = 42^{17} \mod 1591 = 429$.
-Um die Nachricht zu entschl"usseln, berechnen wir $m = D(c) = c^d \mod n = 429^{89} \mod 1591 = 42$.
+Mit diesen Schl"usseln k"onnen wir nun eine Nachricht verschl"usseln, z.b.\@ $m = 42$.
+Die verschl"usselte Version ist \[c = E(m) = m^e = 42^{17} = 429 \mod 1591\]
+Um die Nachricht zu entschl"usseln, berechnen wir
+\[m = D(c) = c^d = 429^{89} = 42 \mod 1591\]
 
 \todo{Angriff?}
 
@@ -360,6 +365,7 @@ oder Text und nicht Zahlen verschl"usseln will.
 Dies ist jedoch nur das leichteste Problem, wenn RSA praktisch implementiert werden soll.
 
 \subsection{Effiziente Berechnung von $a^b \mod n$}
+\label{subsec:practical:exp}
 % Sonst w"are das alles viel zu langsam.
 
 Da man sowohl zum Ver- als auch zum Entschl"usseln $a^b \mod n$
@@ -382,7 +388,7 @@ In der einfachsten Form werden dabei alle $a^{(2^i)}$ multipliziert,
 f"ur die das Bit an der Stelle $i$ (wobei von rechts nach links und mit 0 beginnend gez"ahlt wird)
 in der bin"aren Darstellung von $b$ gleich $1$ ist.
 Da man die Werte $a^{(2^i)}$ erhalten kann, indem man in jedem Schritt $a$ quadriert,
-und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.\@ Quellcodeausschnitt~\ref{code:square-and-multiply})
+und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.~Quellcodeausschnitt~\ref{code:square-and-multiply})
 wird hier wiederholt quadriert und multipliziert.
 Von diesem grundlegenen Algorithmus existieren Abwandlungen,
 die durch noch weniger Multiplikationen mehr Effizienz erreichen.
