@@ -18,6 +18,7 @@ keywordstyle=\color{blue},
 morekeywords={assert},
 basicstyle=\footnotesize\ttfamily,
 numberstyle=\tiny\color{gray},
+commentstyle=\color{teal},
 title=\lstname,
 captionpos=b,
 }
@@ -378,7 +379,8 @@ Nat"urlich ist auch beides gleichzeitig m"oglich~\cite{hac}.
 Ein allgemeiner Ansatz, Exponentiation zu verschnellern, ist sog.\@
 "`repeated square and multiply"' ("`wiederholtes Quadrieren und Multiplizieren"').
 In der einfachsten Form werden dabei alle $a^{(2^i)}$ multipliziert,
-f"ur die das Bit an der Stelle $i$ (\todo{0, rechts->links})in der bin"aren Darstellung von $b$ gleich $1$ ist.
+f"ur die das Bit an der Stelle $i$ (wobei von rechts nach links und mit 0 beginnend gez"ahlt wird)
+in der bin"aren Darstellung von $b$ gleich $1$ ist.
 Da man die Werte $a^{(2^i)}$ erhalten kann, indem man in jedem Schritt $a$ quadriert,
 und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.\@ Quellcodeausschnitt~\ref{code:square-and-multiply})
 wird hier wiederholt quadriert und multipliziert.
@@ -391,22 +393,23 @@ Diese beschreibe ich allerdings nicht hier~\cite{hac}. \todo{Anhang?}
 \begin{code-snip}
 \begin{lstlisting}
 def square_and_multiply_simple(a, b):
-    ergebnis = 1
+    ergebnis = 1  # 1 ist multiplikativ neutral
+    # i nimmt Werte von 0 bis (Anzahl der Bits von b) an
     for i in range(b.bit_length()):
-        if 1 & b:
-            ergebnis *= a
-        a **= 2
-        b >>= 1
+        if (1<<i) & b:  # wenn das ite Bit gesetzt ist
+            ergebnis *= a  # das neue Ergebnis ist das alte Ergebnis mal a
+        a **= 2  # das neue a ist das alte a zum Quadrat
     return ergebnis
 \end{lstlisting}
 \caption{Implementation eines simplen square-and-multiply-Algorithmus nach~\cite{hac}}
 \label{code:square-and-multiply}
 \end{code-snip}
-\todo{Kommentare}
+
 Baut man die modulare Reduktion in die Multiplikation ein,
 bleiben die zu multiplizierenden Zahlen klein, sodass die einzelnen
 Multiplikationen schneller werden.
-Auch hier existiert eine optimierte Variante, die sog.\@ "`Montgomery-Reduktion"'~\cite{hac}.
+Auch hier existiert eine optimierte Variante, die sog.\@ "`Montgomery-Reduktion"',
+die allerdings nur in Kombination mit einem komplexeren square-and-multiply n"utzlich wird~\cite{hac}.
 
 In Python ist eine optimierte modulare Exponentiation als \lstinline{pow(a, b, n)} eingebaut.
 
