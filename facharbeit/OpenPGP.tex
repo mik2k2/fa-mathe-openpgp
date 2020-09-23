@@ -388,7 +388,14 @@ Von diesem grundlegenen Algorithmus existieren Abwandlungen,
 die durch noch weniger Multiplikationen mehr Effizienz erreichen.
 Diese beschreibe ich allerdings nicht hier~\cite{hac}. \todo{Anhang?}
 
-\todo{Beispiel}
+Im einfachen square-and-multiply werden $\lceil \log_2 b \rceil + 1$ bis $2 \lceil \log_2 b \rceil$
+($\lceil x \rceil$ bezeichnet die kleinste ganze Zahl, die gr"o"ser oder gleich $x$ ist)
+Multiplikationen durchgef"uhrt: eine Quadratur pro Bit sowie eine Ergebnismultiplikation pro ge\-setz\-tem Bit~\cite{hac}.
+Dadurch sieht man, dass bin"ar m"oglichst viele Nullen enthaltende Exponenten effizienter sind.
+Die sog.\@ Fermatschen Primzahlen haben die Form $2^x + 1$ und damit zwei gesetzte Bits.
+Diese eignen sich gut als Wahl f"ur $e$, da sie in de facto allen F"allen relativ prim zu
+$\phi(n)$ sein werden und die Exponentiaion schnell ist.
+Die bekannten Fermatschen Primzahlen sind $2^1 + 1 = 3$, $2^2+1 = 5$, $2^4 + 1 = 17$, $2^8+1 = 257$ und $2^{16} + 1 = 65537$.
 
 \begin{code-snip}
 \begin{lstlisting}
@@ -412,6 +419,29 @@ Auch hier existiert eine optimierte Variante, die sog.\@ "`Montgomery-Reduktion"
 die allerdings nur in Kombination mit einem komplexeren square-and-multiply n"utzlich wird~\cite{hac}.
 
 In Python ist eine optimierte modulare Exponentiation als \lstinline{pow(a, b, n)} eingebaut.
+
+\paragraph{Beispiel}
+F"ur die Berechnung von $429^{89} \mod 1591$ mit der einfachen square-and-multiply-Varinte
+mit eingebauter Reduktion f"uhrt man die folgenden Schritte aus.
+Dargestellt ist jeweils der Stand nach der Pr"ufung eines Bits und vor der Erh"ohung von $a$,
+wobei sowohl \texttt{a} als auch \texttt{ergebnis} (Bezeichner aus Quellcodeauschnitt~\ref{code:square-and-multiply} "ubernommen)
+als Potenz von $429$ und reduziert $\mod 1591$ gezeigt werden.
+Die bin"are Darstellung von $89$ ist $1011001_2$. \\
+
+\begin{tabular}{l|c c c c c c}
+    $i$ & Bit & \texttt{ergebnis} & \texttt{ergebnis} (red.\@) & \texttt{a} & \texttt{a} (red.\@) & Multiplikationen\\
+    \hline
+    \hline
+    -- & -- & $1$ & $429$ & $429$ & $429$ & 0 \\
+    \hline
+    0 & 1 & $429$ & $429$ & $429$ & $1076$ & 2 \\
+    1 & 0 & $429$ & $429$ & $429^2$ & $1119$ & 3 \\
+    2 & 0 & $429$ & $429$ & $429^4$ & $44$ & 4 \\
+    3 & 1 & $429 \cdot 429^8 = 429^9$ & $1375$ & $429^8$ & $345$ & 6 \\
+    4 & 1 & $429^9 \cdot 429^{16} = 429^{25}$ & $257$ & $429^{16}$ & $1291$ & 8 \\
+    5 & 0 & $429^{25}$ & $257$ & $429^{32}$ & $904$ & 9 \\
+    6 & 1 & $429^{89}$ & $42$ & $429^{64}$ & $1033$ & 10 \\
+\end{tabular}
 
 \subsection{Primzahlen finden}
 % Vielleicht den Teil hier auch in den Matheteil schieben. Auf jeden Fall im Anhang andere M"oglichkeiten auflisten.
