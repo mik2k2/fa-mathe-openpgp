@@ -287,32 +287,40 @@ Inhaber des privaten Schl"ussels verschickt wurde.
 
 \subsection{Sicherheit}
 
-\todo{Einf"ugen}
-- Wir sind Angreifer; d ist ziel, man braucht e + phi n, e bekannt.
-- Bestimmen von p q mit faktor von n
-- gr"o"se von n: mindestens 700 stellen
-- k"onnte man phi n berechnen, h"atte man p, q => widerspruch
+Wenn man sich vorstellt, als Angreifer eine mit RSA verschl"usselte Nachricht
+lesen zu wollen, sucht man ein $d$, um $D(c)$ berechnen zu k"onnen.
+Bekannt sich als Teil des "offentlichen Schl"ussels sowohl $e$ als auch $n$.
 
-Kennt man die Faktoren $p$ und $q$, kann man leicht\todo{ref} $\phi(n)$ und somit auch $d$ berechnen.
-Die Faktorisierung wird jedoch schon seit Jahrtausenden untersucht,
+Ein Weg, $d$ zu berechnen, ist, wie bei der Schl"usselerstellung,
+den erweiterten Euklidschen Algorithmus auf $e$ und $\phi(n)$ anzuwenden.
+Obwohl mit $e$ schon eine dieser Komponenten bekannt ist, wird $\phi(n)$
+bei der Schl"usselerstellung mit $\phi(n) = n - p - q + 1$ berechnet,
+wozu offensichtlich $p$ und $q$ bn"otigt werden~\cite{rsa}.
+
+Aus $n$ (auch einem Angreifer bekannt) k"onnen $p$ und $q$ mittels der Faktoriserung ermittelt werden.
+Jedoch wird das Foktorisieren von Zahlen schon seit Jahrtausenden untersucht,
 ohne dass eine effiziente Methode gefunden wurde%
 \footnote{f"ur Quantencomputer existieren effiziente Algorithmen,
-jedoch wurden keine ausreichender Gr"o"se gebaut}~\cite{rsa}.
+jedoch wurden keine ausreichender Gr"o"se gebaut}.
+Das hei"st, dass es nach aktuellem Stand praktisch unm"oglich ist,
+Zahlen in der Gr"o"senordnung gel"aufiger Schl"usselgr"o"sen,\footnote{erweitertes Allgemeinwissen}
+also 2048 oder 4096 (seltener 8192) Bits (jeweils etwas "uber 600, 1200 und 2450 Dezimalstellen),
+zu Faktorisieren~\cite{sinews}.
 
-Die Berechnung von $\phi(n)$, ohne "uber die Faktoren zu gehen,
-kann wie folgt in Kenntnis von $p$ und $q$ umgewandelt werden, sodass die Berechnung von $\phi(n)$
-und die Faktorisierung von $n$ "aquivalent sind:\todo{"`Aufwand"'}
+Jeder andere Weg, $\phi(n)$ zu erhalten, ist in etwa so aufwendig wie $n$ zu faktorisieren,
+da folgenderma"sen aus Kenntnis von $\phi(n)$ (und $n$) sowhol $p$ als auch $q$ berechnet werden k"onnen:
 
-Kennt man $\phi(n)$, kann man "uber $\phi(n) = (p-1)(q-1) = n - (p+q) + 1$
-die Summe $p+q$ berechnen.
+Man kann "uber $\phi(n) = (p-1)(q-1) = n - (p+q) + 1$ die Summe $p+q = n + 1 - \phi(n)$ berechnen.
 Danach kann man mit $(p+q)^2 = p^2 + 2n + q^2 = p^2 - 2n + q^2 + 4n = (p-q)^2 + 4n$
-die Differenz $p-q$ und folgend $q = \frac{(p+q) - (p-q)}{2}$ berechnet werden.
+die Differenz $p-q = \sqrt{(p+q)^2 - 4n}$, folgend $q = \frac{(p+q) - (p-q)}{2}$
+und zuletzt $p = \frac{n}{q}$ berechnet werden.
 Dadurch hat man die Faktoren von $n$ berechnet~\cite{rsa}.
 
-Trotz der "Aquivalenz zur Faktorisierung in diesem (und einigen weiteren,
+Trotz der "Aquivalenz (bzql.\@ des Auswands) zur Faktorisierung in diesem (und einigen\todo{eigentlich nur einer} weiteren,
 hier nicht aufgef"uhrten F"allen, die in~\cite{rsa} genannt werden),
-ist nicht automatisch jede Methode, die RSA bricht, eine M"oglichkeit
-zur Faktorisierung~\cite{sinews}.
+ist nicht automatisch jede Methode, die RSA bricht,
+es also einer Person ohne Zugang zum provaten Schl"ussel erlaubt, verschl"usselte Nachrichten zu lesen,
+eine M"oglichkeit zur Faktorisierung von $n$~\cite{sinews}.
 
 \todo{Beispiel komplett}
 
