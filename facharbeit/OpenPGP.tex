@@ -22,6 +22,9 @@ commentstyle=\color{teal},
 title=\lstname,
 captionpos=b,
 }
+\lstdefinelanguage{none}{
+  identifierstyle=
+}
 
 \newfloat{code-snip}{htbp}{what_is_this}
 \floatname{code-snip}{Quellcodeausschnitt}
@@ -653,12 +656,13 @@ die dann ausgegeben werden.
 \subsection{Beispiele}
 Alle der folgenden Beispiele beginnen mit einer Shell-Zeile, die mit \verb|$| beginnt,
 und zeigen danach die jeweiligen Ausgaben.
-Im Anhang wird erl"autert, wie sich die Beispiele reproduzieren lassen
-(mit anderen Schl"usselfingerabdr"ucken).
+Im Anhang wird erl"autert, wie sich die genannten Beispiele reproduzieren lassen
+(mit anderen Schl"usselfingerabdr"ucken) und wie andere Beispieldateien betrachtet werden k"onnen.
 
 \lstset{
 breaklines,
 basicstyle=\scriptsize\ttfamily,
+language=none,
 }
 
 \paragraph{Infos zu geladenen Daten}~
@@ -681,6 +685,96 @@ Public Key b91294876bd058ff9abce9809ad2041a28dc342d
                 POSITIVE_UID signature (RSA/SHA256) by b91294876bd058ff9abce9809ad2041a28dc342d, created 2020-08-22 19:21:27, exportable, revocable
         Public Key 0bca1709a0c297a5fa8e8e6850587fe80adf2136
                 SUBKEY_BIND signature (RSA/SHA256) by b91294876bd058ff9abce9809ad2041a28dc342d, created 2020-08-22 19:21:27, exportable, revocable
+\end{lstlisting}
+
+Es werden alle User IDs angezeigt, man sieht, dass zum ersten Schl"ussel auch der private Teil verf"ugbar ist (\texttt{Key Pair}).
+Die Unterschriften bez"uglich der Verifizierung (\texttt{POSITIVE\_UID}/\texttt{GENERIC\_UID})
+und der Unterschl"usselbindung (\texttt{SUBKEY\_BIND}) werden angezeigt.
+Eine Unterschrift stammt von einem unbakannten Schl"ussel und wird daher nicht angezeigt.
+Im Folgenden wird diese Warnung weggelassen.
+
+\paragraph{Einlesen von Nachrichten}~\\
+Unterschriebene Nachrichten werden validiert.
+Angezeigt werden Unterschriften und Nachrichtvorschau.
+\begin{lstlisting}
+$ python3 -m openpgp --load data/text-message info
+Keys:
+------------------------------
+[entfernt]
+
+Messages:
+------------------------------
+'Hello there.\nThis is a ...Windows and Mac.\nBye!\n'
+        file "", 2020-08-22 19:21:28
+        TEXT signature (RSA/SHA512) by 0bca1709a0c297a5fa8e8e6850587fe80adf2136, created 2020-08-22 19:21:28, exportable, revocable
+\end{lstlisting}
+Zum Speichern von Nachrichten werden diesen zum STDOUT geschrieben.
+Durch Umleitung kann man sie in Dateien Speichern.
+\begin{lstlisting}
+$ python3 -m openpgp --load data/text-message save-message
+Hello there.
+This is a test text.
+Using text mode should handle line endings
+and make me be five (plus a trailing newline) lines long even on Windows and Mac.
+Bye!
+\end{lstlisting}
+
+\paragraph{Erstellen von Nachrichten}
+Um eine Datei zu unterschrieben und verschl"usseln, muss man:
+\begin{enumerate}
+    \item Die Datei (hier \texttt{/bin/true}) ins OpenPGP-FOrmat konvertieren
+    \item Die Datei mit dem/den eigenen privaten Schl"ussel(n) unterschrieben
+    \item Die Datei verschl"usseln, wobei die eigentliche Datei symmetrisch
+        und nur der symmetrische Schl"ussel asymmetrisch verschl"usselt wird.
+        Es ist sinnvoll, an dieser Stelle auch an sich selbst zu verschl"usseln.
+\end{enumerate}
+Hier wird auch das Entschl"usseln und der Vergleich mit der Originaldatei gezeigt.
+\begin{lstlisting}
+$ python3 -m openpgp pgpify /bin/true \
+  | python3 -m openpgp -l- sign 'Key 1' \
+  | python3 -m openpgp -l- sign ab81c14d62c5f29ace16d1f61fca78e3f66150ec \
+  | python3 -m openpgp -l- encrypt --recipient 'Key 2' --recipient alt-uid --symm-algo AES128 > /tmp/encrypted-true
+$ python3 -m openpgp --load /tmp/encrypted-true info
+Keys:
+------------------------------
+Key Pair 4e339f0639d483e03fd4dd7b22f24394feb09179
+        [UIDs entfernt]
+        Key Pair ab81c14d62c5f29ace16d1f61fca78e3f66150ec
+                [Unterschrift entfernt]
+Public Key b91294876bd058ff9abce9809ad2041a28dc342d
+        [UID entfernt]
+        Public Key 0bca1709a0c297a5fa8e8e6850587fe80adf2136
+                [Unterschrift entfernt]
+
+Messages:
+------------------------------
+<binary data>
+        file "/bin/true", 2020-09-24 16:35:21
+        BINARY signature (RSA/SHA256) by 4e339f0639d483e03fd4dd7b22f24394feb09179, created 2020-09-24 16:35:21, exportable, revocable
+        BINARY signature (RSA/SHA256) by ab81c14d62c5f29ace16d1f61fca78e3f66150ec, created 2020-09-24 16:35:21, exportable, revocable
+$ python3 -m openpgp --load /tmp/encrypted-true save-message >/tmp/decrypted-true
+$ sha256sum /bin/true /tmp/decrypted-true
+65fd744686e1c8ad156c57637e3cb3c76f003cf075a67eed287667ab969503a5  /bin/true
+65fd744686e1c8ad156c57637e3cb3c76f003cf075a67eed287667ab969503a5  /tmp/decrypted-true
+\end{lstlisting}
+
+\paragraph{Was nicht funktioniert}~\\
+Ohne privaten schl"ussel ist offensichtlich sowohl unterschreiben als auch entschl"usseln unm"oglich:
+\begin{lstlisting}
+$ python3 -m openpgp pgpify /bin/true | python -m openpgp -l- encrypt --recipient 'Key 2' | python -m openpgp -l- info
+2020-09-24 16:49:18,713 - ERROR(openpgp.parse): No session key. Encrypted for: ['9ad2041a28dc342d']
+Keys:
+------------------------------
+Key Pair 4e339f0639d483e03fd4dd7b22f24394feb09179
+        [UIDs entfernt]
+        Key Pair ab81c14d62c5f29ace16d1f61fca78e3f66150ec
+                [Unterschrift entfernt]
+Public Key b91294876bd058ff9abce9809ad2041a28dc342d
+        [UID entfernt]
+        Public Key 0bca1709a0c297a5fa8e8e6850587fe80adf2136
+                [Unterschrift entfernt]
+$ python3 -m openpgp pgpify /bin/true | python -m openpgp -l- sign 'Key 2'
+No such key:  Key 2
 \end{lstlisting}
 
 \section{Ausleitung}
