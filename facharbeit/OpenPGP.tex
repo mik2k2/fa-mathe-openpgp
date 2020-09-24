@@ -49,6 +49,7 @@ captionpos=b,
 \thispagestyle{empty}
 \newpage
 \tableofcontents
+\thispagestyle{empty}
 \newpage
 
 \section{Einleitung}
@@ -787,6 +788,9 @@ Der Schluss sollte die Fragestellung aus der Einleitung aufgreifen und die wicht
 
 \appendix
 
+\addcontentsline{toc}{section}{Literatur}
+\input{citations.tex}
+
 \section{kompletter Quellcode}
 \todo{sind ca. 30 Seiten}
 \lstset{language=Python}
@@ -814,9 +818,9 @@ Der Schluss sollte die Fragestellung aus der Einleitung aufgreifen und die wicht
 \paragraph{\cite{sinews}}
 \includegraphics[width=\textwidth]{sinews.pdf}
 
-\section{Literatur}
-
-%! suppress = MightBreakTexify
-\renewcommand{\section}[2]{}
-\input{citations.tex}
+\section{Selbst"andigkeitserkl"arung}
+Ich habe die vorliegende Facharbeit selbständig angefertigt und keine anderen als die angegebenen Hilfsmittel benutzt.
+Alle "ubernommenen Textteile sind als Zitate gekennzeichnet und mit genauer Quellenangabe belegt. \\~\\
+\rule{0.3\textwidth}{1pt}~\\
+\piisignature
 \end{document}
