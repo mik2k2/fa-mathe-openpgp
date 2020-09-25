@@ -89,6 +89,14 @@ W"ah\-rend sich OpenPGP auch mit der Vernetzung von Schl"usseln im Sinne eines s
 habe ich mich bei meiner Teilimplementation haupts"achlich auf die durch RSA m"oglich gemachten
 Funktionalit"aten konzentriert\footnote{Wobei nat"urlich Unterschriften "uber Schl"ussel f"ur das WoT wichtig sind, und ich somit diesen Teilaspekt mitimplementiert habe}.
 
+In dieser Facharbeit sollen die mathematischen Grundlagen von RSA beleuchtet und
+fachlich korrekt sowie allgemein verst"andlich erkl"art werden,
+einige konkrete Hinweise f"ur eine praktische Umsetzung angesprochen werden
+sowie am Beispiel der Einbettung von RSA in OpenPGP tats"achliche praktische
+Eins"atze asymmetrisscher Kryptographie dargestellt werden.
+Im Verlauf soll progressive eine Entwicklung von den mathematischen Hintergr"unden
+hin zur praktischen Anwendung ersichtlich werden.
+
 \section{Mathe hinter RSA}
 %Nachrichten und Schl"ussel sind Zahlen.
 %Hier wahrscheinlich sehr viel aus dem RSA-Paper zitieren.
@@ -785,6 +793,26 @@ Facharbeitshinweise:
 \begin{quote}
 Der Schluss sollte die Fragestellung aus der Einleitung aufgreifen und die wichtigsten Untersuchungsergebnisse zusammenfassen. Er kann den Untersuchungsgegenstand in größere Zusammenhänge einordnen und einen Ausblick auf künftige Entwicklungen enthalten. Auch kann hier das methodische Vorgehen kritisch reflektiert werden.
 \end{quote}
+
+Mathematisch ist das komplette RSA-System inklusive Schl"usselerstellung, Verschl"usselung,
+Entschl"usselung, Unterschriftenerstellung sowie Unterschriftenvalidierung erkl"art worden.
+Au"serdem ist in Tiefe auf den Beweis der Funktionalit"at eingegengen worden.
+
+Bez"uglich der praktischen Umsetzung ist mit der Primzahlpr"ufung ein zentrales
+Problem f"ur Schl"usselgeneration in der Praxis und mit effizienter modularer Exponentiation
+ein Problem bei der praktischen Umsetzung der Operationen (Ver-/Entschl"usseln, Unterschriften erstellen/validieren)
+jeweils ges"ost worden, wobei nur jeweils eine M"oglichkeit in Tiefe behandlet wurde.
+Besonders bez"uglich der modularen Exponentiation existieren viele deutlich bessere (und etwas komplexere)
+Ans"atze, die den Rahmen dieser Arbeit gesprengt h"atten.
+Leser sind dazu eingeldaen, dazu Kapitel 14.6 in Quelle~\cite{hac} zu lesen.
+
+Die praktische Anwendung von RSA konnte Aufgrund des auf 16 Textseiten begrenzten Umfangs leider
+nur grob umrissen werden, wobei mit der hybriden Kryptographie ein zentrales
+Merkmal praktisch angewandter asymmetrischer Kryptographiesystemen erkl"art wurde.
+Auch ist mit OpenPGP eine spezielle Anwendung ausf"uhrlicher Beschrieben worden,
+sodass Grundideen sich in etwa auf andere Anwendungen "ubertragen lassen sollten.
+Mittels der zahlreichen Beispiele und der M"oglichkeit, selbst mit meiner Implementation
+zu experimentieren \todo{Machen}, sollte das Konzept anschaulich abgerundet worden sein.
 
 \appendix
 
