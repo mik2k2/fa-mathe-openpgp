@@ -514,6 +514,77 @@ mit jedem $a$ um Faktor $\frac{1}{4}$, also exponentiell.
 W"ahlt man $t$ Wiederholungen, betr"agt die maximale Wahrscheinlichkeit, eine zusammengesetzte Zahl nicht als solche zu erkennen,
 $\left(\frac{1}{4}\right)^t = \frac{1}{2^{2t}}$~\cite{hac}.
 
+\begin{code-snip}
+\begin{lstlisting}
+def miller_rabin_single(n):  # n ist die zu testende Zahl
+    r = n-1
+    s = 0
+    while (r % 2) == 0:  # solange r durch 2 teilbar ist
+        r //= 2
+        s += 1
+    assert n == 2**s * r + 1  # es gilt: n = 2^s * r + 1
+    a = random.randint(2, n-2)  # a ist eine Zufallszahl in [2; n-2]
+    x = pow(a, r, n)  # x = a^r mod n
+    if x in (1, n-1):  # wenn a^r = 1 mod n oder a^r = -1 mod n
+        return True  # kann prim sein
+    for j in range(1, s):  # alle j in [1; s[
+        x = pow(x, 2, n)  # das neue x ist das alte x zum Quadrat mod n
+        # => x = (a^r)^(2^j)
+        if x == n-1:  # wenn x = a^(r * 2^j) = -1 mod n
+            return True  # kann prim sein
+    return False  # keinesfalls prim
+\end{lstlisting}
+\caption{Eine einzele vereinfachte Iteration des Miller-Rabin-Algorithmus.
+In \texttt{openpgp/rsa.py} ab Zeile 18 ist eine bessere Implementation zu finden.}
+\label{code:miller-rabin}
+\end{code-snip}
+
+\paragraph{Beispiel}
+Wir wollen pr"ufen, ob $n = 8353$ prim ist, und bestimmen dazu zun"achst $r, s$ so, dass $n - 1 = 2^s r$.
+Dazu teilt man sowiet wie m"oglich $n-1 = 8352$ durch 2:
+\[ \frac{8352}{2} = 4176 \qquad \frac{4176}{2} = 2088 \qquad \frac{2088}{2} = 1044 \qquad
+\frac{1044}{2} = 522 \qquad \frac{522}{2} = 261 \]
+Daher ist $n-1 = 8352 = 2^5 \cdot 261$, also ist $s = 5$ und $r = 261$.
+
+Zun"achst w"ahlen wir zuf"allig $a = 6848$.
+Da $a^r = 6848^{261} = 3597 \mod 8353 \not\in \{1; 8352\}$, pr"ufen wir die anderen Kongruenzen:\\
+
+\begin{tabular}{c|l}
+    $j$ & $(a^r)^{(2^j)} \mod n$ \\
+    \hline
+    1 & $3597^2 \equiv 7965 \not\equiv -1$ \\
+    2 & $7965^2 \equiv 190 \not\equiv -1$ \\
+    3 & $190^2 \equiv 2688 \not\equiv -1$ \\
+    4 & $2688^2 \equiv 8352 \equiv -1$ \\
+\end{tabular} \\
+
+\noindent
+Da die Kongruenz gilt, kann es sein, dass es sich um eine Primzahl handelt,
+wir k"onnen es aber nicht mit Sicherheit sagen.
+
+Wir w"ahlen ein weiteres zuf"alliges $a = 5579$.
+Nun ist $a^r = 5579^{261} = 8352 \mod 8353 \in \{1; 8352\}$,
+wir k"onnen also wieder nicht sagen, dass $8353$ zusammengesetzt ist.
+Auch f"ur $7328$, $2736$ und $3821$ gilt mindestens eine der Kongruenzen.
+
+Da wir f"ur f"unf zuf"allige Zahlen $a$ Tests durchgef"uhrt haben,
+ist die Wahrscheinlichkeit, das $8353$ prim ist, mindestens:
+\[1 - \frac{1}{4^5} = \frac{1023}{1024} \approx 99,90234 \% \]
+
+Durch noch mehr Iterationen des Tests kann die Wahrscheinlichkeit,
+eine zusammengesetzte Zahl nicht als solche zu erkennen,
+auf noch niedrigere Werte bringen:\\
+
+\begin{tabular}{c|c}
+    Iterationen & Wahrscheinlichkeit (gerundet) \\
+    \hline
+    1 & $0,25$ \\
+    5 & $9,766 \cdot 10^{-4}$ \\
+    10 & $9,537 \cdot 10^{-7}$ \\
+    30 & $9,674 \cdot 10^{-19}$ \\
+    100 & $6,223 \cdot 10^{-61}$ \\
+\end{tabular}
+
 \subsection{Der PKCS\#1-Standard}
 % Warum man Padding benutzt. Entweder nur die f"ur OpenPGP benutzten Teile oder alles. Vielleicht auch nur die vorletzte Version.
 
