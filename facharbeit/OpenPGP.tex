@@ -866,25 +866,29 @@ Facharbeitshinweise:
 Der Schluss sollte die Fragestellung aus der Einleitung aufgreifen und die wichtigsten Untersuchungsergebnisse zusammenfassen. Er kann den Untersuchungsgegenstand in größere Zusammenhänge einordnen und einen Ausblick auf künftige Entwicklungen enthalten. Auch kann hier das methodische Vorgehen kritisch reflektiert werden.
 \end{quote}
 
-Mathematisch ist das komplette RSA-System inklusive Schl"usselerstellung, Verschl"usselung,
-Entschl"usselung, Unterschriftenerstellung sowie Unterschriftenvalidierung erkl"art worden.
-Au"serdem ist in Tiefe auf den Beweis der Funktionalit"at eingegengen worden.
+RSA fu"st, wie in dieser Arbeit deutlich gemacht, auf zwei Grundlagen:
+die der modularen Arithmetik, besonders in Kombination mit Exponentiation
+und die der Primzahlen.
 
-Bez"uglich der praktischen Umsetzung ist mit der Primzahlpr"ufung ein zentrales
-Problem f"ur Schl"usselgeneration in der Praxis und mit effizienter modularer Exponentiation
-ein Problem bei der praktischen Umsetzung der Operationen (Ver-/Entschl"usseln, Unterschriften erstellen/validieren)
-jeweils ges"ost worden, wobei nur jeweils eine M"oglichkeit in Tiefe behandlet wurde.
-Besonders bez"uglich der modularen Exponentiation existieren viele deutlich bessere (und etwas komplexere)
-Ans"atze, die den Rahmen dieser Arbeit gesprengt h"atten.
-Leser sind dazu eingeldaen, dazu Kapitel 14.6 in Quelle~\cite{hac} zu lesen.
+Modulare Arithmetik spielt auch in anderen asmmetrischen Kryptosystemen,
+wie etwa dem Diffie-Hellmen key exchange oder ElGamal, eine gro"se Rolle.
+Entsprechend ist auch die praktische Verschnellerung odularer Exponentiation
+weitlaufend untersucht.
+In dieser Arbeit ist nur eine simple Grundlage n"aher besprochen worden,
+jedoch sind Leser eingeladen, auch "uber andere bzw.\@ verbesserte Ans"atze
+in Kapitel 14.6 der Quelle~\cite{hac} zu lesen.
 
-Die praktische Anwendung von RSA konnte Aufgrund des auf 16 Textseiten begrenzten Umfangs leider
-nur grob umrissen werden, wobei mit der hybriden Kryptographie ein zentrales
-Merkmal praktisch angewandter asymmetrischer Kryptographiesystemen erkl"art wurde.
-Auch ist mit OpenPGP eine spezielle Anwendung ausf"uhrlicher Beschrieben worden,
-sodass Grundideen sich in etwa auf andere Anwendungen "ubertragen lassen sollten.
-Mittels der zahlreichen Beispiele und der M"oglichkeit, selbst mit meiner Implementation
-zu experimentieren \todo{Machen}, sollte das Konzept anschaulich abgerundet worden sein.
+Primzahlen, von ihrer mathematischen Natur aus eines der abstraktesten Themen,
+sind durch asymmetrische Kryptographie wichtig in der parktiscehn Anwendung geworden.
+\todo{Zitat dazu}
+
+\todo{OpenPGP}
+
+Obwohl derzeit auf elliptischen Kurven (auch eine sehr anstrakt methematische Grundlage)
+basierende asymmetrische Kryptographie st"arker verwendet wird,
+ist absehbar, dass RSA f"ur die breiten Bev"olkerungsmassen als Bestandteil
+der TLS-Rootzertifikate in Webbrowsern noch Jahre und in speziellen Anwendungen m"oglicherweise
+noch Jahrzehnte relevant bleiben wird.
 
 \appendix
 
