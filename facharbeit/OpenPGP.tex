@@ -55,8 +55,6 @@ captionpos=b,
 \section{Einleitung}
 % Asymmetrische Kryptographie ist toll. Damit kann man vieles machen (verschl"usseln, unterschreiben). [Bild von Wikipedia] Im "`digitalen Zeitalter"' ist das wichtig. (TLS, IoT). OpenPGP (Phil Zimmermann) ist neben S/MIME das Standardprotokoll f"ur krypto-behandelte E-Mails, hat aber auch z.B. WoT. Ich habe einen Teil davon implementiert.
 
-\todo{Brauche ich f"ur diese Sachen Zitate?}
-
 Traditionell waren Verschl"usselungsverfahren "`symmetrisch"', d.h., dass wie bei einem physischen Schloss
 der gleiche Schl"ussel zum Verschlie"sen (Verschl"usseln) und zum Aufschlie"sen (Entschl"usseln) verwendet wird.
 Der Ver\-schl"us\-sel\-ungs\-pro\-zess ist im Laufe der Zeit komplizierter geworden
@@ -293,7 +291,7 @@ m^{ed} \equiv m \mod n
 An dieser letzten Kongruenz sieht man, dass $D(E(m)) = (m^e)^d = m^{ed} \equiv m$,
 die Ver- und Entschl"usselungsfunktionen also tats"achlich funktionieren~\cite{rsa}.
 
-\subsection{Cool! Damit kann man auch unterschreiben}
+\subsection{Verwendbarkeit f"ur digitale Unterschriften}
 
 Die Ver- und Entschl"usselungsfunktionen lassen sich offensichtlich
 auch verkehrt herum anwenden, ohne dass es zu Problemen kommt:
@@ -333,15 +331,18 @@ Man kann "uber $\phi(n) = (p-1)(q-1) = n - (p+q) + 1$ die Summe $p+q = n + 1 - \
 Danach kann man mit $(p+q)^2 = p^2 + 2n + q^2 = p^2 - 2n + q^2 + 4n = (p-q)^2 + 4n$
 die Differenz $p-q = \sqrt{(p+q)^2 - 4n}$, folgend $q = \frac{(p+q) - (p-q)}{2}$
 und zuletzt $p = \frac{n}{q}$ berechnet werden.
-Dadurch hat man die Faktoren von $n$ berechnet~\cite{rsa}.
+Dadurch hat man die Faktoren von $n$ berechnet.
+Da dieser Ansatz zur Faktorisierung h"ochstwahrscheinlich ausgenutzt worden w"are,
+wenn die Berechnung von $\phi(n)$ leichter w"are, als $n$ zu sonstwie faktorisieren,
+kann man davon ausgehen, dass es nicht leicht ist, $\phi(n)$ zu erhalten~\cite{rsa}.
 
-Trotz der "Aquivalenz (bzql.\@ des Auswands) zur Faktorisierung in diesem (und einigen\todo{eigentlich nur einer} weiteren,
+Trotz der "Aquivalenz (bzgl.\@ des Aufwands) zur Faktorisierung in diesem (und einigen\todo{eigentlich nur einer} weiteren,
 hier nicht aufgef"uhrten F"allen, die in~\cite{rsa} genannt werden),
 ist nicht automatisch jede Methode, die RSA bricht,
 es also einer Person ohne Zugang zum provaten Schl"ussel erlaubt, verschl"usselte Nachrichten zu lesen,
 eine M"oglichkeit zur Faktorisierung von $n$~\cite{sinews}.
 
-\subsection{komplettes Beispiel}
+\subsection{Komplettes Beispiel}
 
 Als Primzahlen w"ahlen wir $p = 37$ und $q = 43$.
 Entsprechend ist $n = pq = 1591$ und $\phi(n) = n - p - q + 1 = 1512$.
@@ -368,8 +369,6 @@ Die verschl"usselte Version ist \[c = E(m) = m^e = 42^{17} = 429 \mod 1591\]
 Um die Nachricht zu entschl"usseln, berechnen wir
 \[m = D(c) = c^d = 429^{89} = 42 \mod 1591\]
 
-\todo{Angriff?}
-
 \section{RSA praktisch implementieren}
 % Bytes kann man einfach in Zahlen umwandeln, aber es geh"ort noch etwas mehr dazu
 
@@ -385,9 +384,9 @@ Dies ist jedoch nur das leichteste Problem, wenn RSA praktisch implementiert wer
 Da man sowohl zum Ver- als auch zum Entschl"usseln $a^b \mod n$
 (jeweils mit Basis $m$ oder $c$ und Exponent $e$ oder $d$) berechnen muss,
 jedoch die jeweiligen Exponenten ($e$, $d$) in den allermeisten F"allen
-in der Gr"o"senordnung von mindestens f"unf Stellen liegen
-(der meistgenutzte\footnote{In GnuPG und OpenSSl Defaultwert,
-und in \emph{jedem} RSA-Zertifikat, welches ich gesehen habe}
+in der Gr"o"senordnung von mindestens f"unf Dezimaltellen liegen
+(der meistgenutzte\footnote{In GnuPG und OpenSSL Defaultwert,
+und in \emph{jedem} TLS-RSA-Zertifikat, welches ich gesehen habe}
 "offentliche Exponent ist 65537),
 ist es notwendig, modulare Exponentiation zu optimieren,
 damit Ver- und Entschl"usselung praktikabel wird.
@@ -406,12 +405,13 @@ und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.~Quellcodeaussch
 wird hier wiederholt quadriert und multipliziert.
 Von diesem grundlegenen Algorithmus existieren Abwandlungen,
 die durch noch weniger Multiplikationen mehr Effizienz erreichen.
-Diese beschreibe ich allerdings nicht hier~\cite{hac}. \todo{Anhang?}
+Diese beschreibe ich allerdings nicht hier~\cite{hac}.
 
 Im einfachen square-and-multiply werden $\lceil \log_2 b \rceil + 1$ bis $2 \lceil \log_2 b \rceil$
 ($\lceil x \rceil$ bezeichnet die kleinste ganze Zahl, die gr"o"ser oder gleich $x$ ist)
-Multiplikationen durchgef"uhrt: eine Quadratur pro Bit sowie eine Ergebnismultiplikation pro ge\-setz\-tem Bit~\cite{hac}.
-Dadurch sieht man, dass bin"ar m"oglichst viele Nullen enthaltende Exponenten effizienter sind.
+Multiplikationen durchgef"uhrt: eine Quadratur pro Bit sowie eine Ergebnismultiplikation pro ge\-setz\-tem Bit.
+Dadurch sieht man, dass bin"ar m"oglichst viele Nullen enthaltende Exponenten effizienter sind~\cite{hac}.
+
 Die sog.\@ Fermatschen Primzahlen haben die Form $2^x + 1$ und damit zwei gesetzte Bits.
 Diese eignen sich gut als Wahl f"ur $e$, da sie in de facto allen F"allen relativ prim zu
 $\phi(n)$ sein werden und die Exponentiaion schnell ist.
@@ -443,7 +443,7 @@ In Python ist eine optimierte modulare Exponentiation als \lstinline{pow(a, b, n
 \paragraph{Beispiel}
 F"ur die Berechnung von $429^{89} \mod 1591$ mit der einfachen square-and-multiply-Varinte
 mit eingebauter Reduktion f"uhrt man die folgenden Schritte aus.
-Dargestellt ist jeweils der Stand nach der Pr"ufung eines Bits und vor der Erh"ohung von $a$,
+Dargestellt ist jeweils der Stand nach der Pr"ufung eines Bits und vor der Erh"ohung von \texttt{a},
 wobei sowohl \texttt{a} als auch \texttt{ergebnis} (Bezeichner aus Quellcodeauschnitt~\ref{code:square-and-multiply} "ubernommen)
 als Potenz von $429$ und reduziert $\mod 1591$ gezeigt werden.
 Die bin"are Darstellung von $89$ ist $1011001_2$. \\
@@ -467,7 +467,7 @@ Die bin"are Darstellung von $89$ ist $1011001_2$. \\
 % Vielleicht den Teil hier auch in den Matheteil schieben. Auf jeden Fall im Anhang andere M"oglichkeiten auflisten.
 Um Schl"ussel zu generieren, braucht man zun"achst Primzahlen.
 Um diese Primzahlen zu erhalten, ist es aufgrund der Gr"o"se
-(ab ca.\@ 1024 bits bzw.\@ 308 Ziffern)
+(ab ca.\@ 1024 Bits bzw.\@ 308 Ziffern)
 inpraktikabel (darauf beruht die Sicherheit), alle Primzahlen zu finden.
 Daher sieht die Prozedur zur Primzahlengeneration wie folgt aus~\cite{hac}:
 \begin{quote}
@@ -496,21 +496,22 @@ diese wenige Zahlen pr"uft~\cite{hac}.
 \subsubsection{Der Miller-Rabin-Test}
 Der Miller-Rabin-Test ist ein probabilistischer test, der "`nur"' beweisen kann,
 dass eine Zahl zusammengesetzt ist.
-Daf"ur wird die Tatsache verwendet, dass f"ur eine Primzahl $p = 2^s r+1$ und eine
-zu $p$ relativ prime ganze Zahl entweder $a^r \equiv 1 \mod p$ oder
-$a^{(2^j)r} \equiv -1 \mod p$ f"ur ein $j$ mit $0 \leq j \leq s-1$~\cite{hac}.
+Daf"ur wird die Tatsache verwendet, dass f"ur eine Primzahl $p = 2^s r+1$ mit $r, s \in \mathbb{N}$
+und eine zu $p$ relativ prime ganze Zahl $a$ entweder $a^r \equiv 1 \mod p$ oder
+$a^{(2^j)r} \equiv -1 \mod p$ f"ur ein $j$ mit $0 \leq j \leq s-1$ gilt~\cite{hac}.
 
-Man pr"uft nun f"ur zuf"allig gew"ahlte $a$, ob eine der Kongruenzen gilt.
+Man pr"uft nun f"ur verscheidene zuf"allig gew"ahlte $a$, ob eine der Kongruenzen gilt.
 Dabei kann wegen $a^{(2^j)r} = (a^r)^{(2^j)}$ w"ahrend der "Uberpr"ufung von
 $a^{(2^j)r} \equiv -1 \mod p$ der Initialwert $a^r$ bei Erh"ohung von $j$ einfach quadriert werden,
 sodass insgesamt weniger Rechnungen ben"otigt werden~\cite{hac}.
+
 Gilt keine der Kongruenzen, wird angenommen, dass die Zahl prim ist.
 F"ur eine ungerade zusammengesetzte Zahl $n$ gilt,
 dass maximal $\frac{1}{4}$ der Zahlen $a$ mit $2 \leq a \leq n-1$ die Kongruenzen nicht erf"ullen,
 d.h., dass f"alschlicherweise eine Primzahl angenommen wird.
-W"ahlt man $a$ zuf"allig, sinkt die Wahrscheinlichkeit, zusammengesetzte Zahlen als prim zu erkennen,
+W"ahlt man $a$ zuf"allig, sinkt die maximale Wahrscheinlichkeit, zusammengesetzte Zahlen als prim zu erkennen,
 mit jedem $a$ um Faktor $\frac{1}{4}$, also exponentiell.
-W"ahlt man $t$ Wiederholungen, betr"agt die Wahrscheinlichkeit, eine zusammengesetzte Zahl nicht als solche zu erkennen,
+W"ahlt man $t$ Wiederholungen, betr"agt die maximale Wahrscheinlichkeit, eine zusammengesetzte Zahl nicht als solche zu erkennen,
 $\left(\frac{1}{4}\right)^t = \frac{1}{2^{2t}}$~\cite{hac}.
 
 \subsection{Der PKCS\#1-Standard}
