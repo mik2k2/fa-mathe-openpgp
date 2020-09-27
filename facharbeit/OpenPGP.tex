@@ -9,6 +9,7 @@
 \usepackage{listings}
 \usepackage{float}
 \usepackage{graphicx}
+\usepackage{amsfonts}
 \reversemarginpar
 
 \lstset{
@@ -27,7 +28,6 @@ captionpos=b,
 \lstdefinelanguage{none}{
   identifierstyle=
 }
-
 \newfloat{code-snip}{htbp}{what_is_this}
 \floatname{code-snip}{Quellcodeausschnitt}
 
@@ -70,12 +70,12 @@ sodass Menschen verschl"usselt kom\-mu\-ni\-zie\-ren k"onnen, ohne vorher einen 
 Neben Verschl"usselung von Nachrichten kann das Konzept asymmetrischer Kryptographie
 auch f"ur digitale Unterschriften verwendet werden.
 
-Der erste solche Verschl"usselungsalgorithmus, der auch in der Lage ist, Unterschriften zu erstellen und zu verifizieren, ist RSA.
+Der erste solche Verschl"usselungsalgorithmus, der auch in der Lage ist, Unterschriften zu erstellen und zu verifizieren, ist RSA\@.
 Diesen m"ochte ich in dieser Arbeit n"aher betrachten und auch selbst implementieren.
 RSA wird weiterhin in verschl"usselten Verbindungen mit gr"o"seren Seiten
-wie etwa \texttt{wikipedia.org}, \\ \texttt{google.com} oder \piibigsite{} verwendet%
+wie etwa \texttt{wikipedia.org}, \\ \texttt{google.com} oder \piibigsite{} verwendet.%
 \footnote{Obwohl sowohl Google als auch Wikipedia inzwischen ECC-Schl"ussel verwenden,
-sind die Schl"ussel der entsprechenden Root-CAs noch immer RSA-2048 (Stand \today)}.
+sind die Schl"ussel der entsprechenden Root-CAs noch immer RSA-2048 (Stand \today)}
 
 Neben dieser Anwendung in TLS (der Kryptographie-Komponente\footnote{
 TLS ist trotz dieser massiven Anwendung im WWW ein separates Protokoll und wird auch z.B. f"ur SMTPS oder FTPS (nicht mit SFTP zu verwechseln, welches "uber SSH l"auft) verwendet}
@@ -91,7 +91,7 @@ In dieser Facharbeit sollen die mathematischen Grundlagen von RSA beleuchtet und
 fachlich korrekt sowie allgemein verst"andlich erkl"art werden,
 einige konkrete Hinweise f"ur eine praktische Umsetzung angesprochen werden
 sowie am Beispiel der Einbettung von RSA in OpenPGP tats"achliche praktische
-Eins"atze asymmetrisscher Kryptographie dargestellt werden.
+Eins"atze asymmetrischer Kryptographie dargestellt werden.
 Im Verlauf soll progressive eine Entwicklung von den mathematischen Hintergr"unden
 hin zur praktischen Anwendung ersichtlich werden.
 
@@ -107,7 +107,6 @@ verwandelt unter Zuhilfenahme eines anderen Schl"ussels -- dies ist der asymmetr
 den chiffrierten Text in die urspr"ungliche Nachricht.
 Es gilt also $m = D(E(m))$.
 Anders ausgedr"uckt: $D$ ist Umkehrfunktion von $E$~\cite{rsa}.
-\todo{Hier irgendwo auch Unterschriften erw"ahnen?}
 
 \subsection{Wie Schl"ussel aussehen}
 \label{subsec:rsa:keys}
@@ -164,10 +163,9 @@ Eingaben sind zwei nat"urliche Zahlen $a_0, b_0$~\cite{taocp2}:
         \item $s_1 \gets s_2$, $s_2 \gets s_1 - s_2 q$
         \item $t_1 \gets t_2$, $t_2 \gets t_1 - t_2 q$
     \end{itemize}
-\end{enumerate}\cite{taocp2}
+\end{enumerate}
 
 \paragraph{Beispiel nach~\cite{taocp2}}
-~\\
 Mit $a_0 = 40902$ und $b_0 = 24140$.
 Dargestellt ist jeweils der Stand nach Ausf"uhrung des zweiten Schritts.\\
 
@@ -217,12 +215,12 @@ Zusammengefasst f"uhrt man die folgenden Schritte aus, um einen Schl"ussel zu er
     \item Zwei gro"se Primzahlen $p$ und $q$ finden
     \item $n = pq$ sowie $\phi(n) = n - p - q + 1$ berechnen
     \item Ein $e$ w"ahlen, welches relativ prim zu $\phi(n)$ ist
-    \item Den erweiterten euklidischen Alogrithmus auf $e$ und $\phi(n)$ anwenden, um $d$ zu erhalten
+    \item Den erweiterten Euklidschen Alogrithmus auf $e$ und $\phi(n)$ anwenden, um $d$ zu erhalten
     \item Der "offentliche Schl"ussel ist $(e, n)$, der private $(d, n)$
 \end{enumerate}
 
 \noindent
-Ein Beispiel u.a.\@ zur Schl"usselerstellung findet sich unten.
+Ein Beispiel u.a.\@ zur Schl"usselerstellung findet sich in Abschnitt~\ref{subsec:math:example}.
 
 \subsection{Ver-/Entschl"usselungsprozess}
 % Das hier wird wahrscheinlich "Uberschneidungen mit "`Wie Schl"ussel aussehen"' haben.
@@ -241,8 +239,8 @@ Nach Euler gilt $a^{b-1} \equiv 1 \mod b$ f"ur alle $b \in \mathbb{P}$ und $a \i
 wenn $a$ nicht durch $b$ teilbar ist, also $a \not\equiv 0 \mod b$~\cite{euler41}.
 Da $p$ (Faktor von $n$, s.~Abs.~\ref{subsec:rsa:keys}) prim ist,
 gilt offensichtlich $a^{p-1} \equiv 1 \mod p$
-(f"ur ein beliebiges $a$ wie oben beschrieben) und somit f"ur alle $m \not\equiv 0 \mod p$ auch
-$m \cdot a^{p-1} \equiv m \mod p$.
+(f"ur ein beliebiges $a$ wie oben beschrieben) und somit f"ur alle $m \in \mathbb{N}$ auch
+$m \cdot a^{p-1} \equiv m \mod p$~\cite{rsa}.
 
 Setzt man f"ur $a$ den Wert $m^{k \cdot (q-1)}$ ein,
 wobei $k$ eine folgend n"aher bestimmte nat"urliche Zahl, $q$ der zweite Faktor von $n$
@@ -252,14 +250,14 @@ erh"alt man f"ur die linke Seite der Kongruenz~\cite{rsa}:
     m \cdot \left(m^{k(q-1)}\right)^{p-1} = m \cdot m^{k(q-1)(p-1)} = m \cdot m^{k\phi(n)} = m^{k\phi(n) + 1}
 \]
 Die gesamte Kongruenz lautet also $m^{k\phi(n)+1} \equiv m \mod p$ und
-gilt weiterhin nur f"ur $m^{k(q-1)} \not\equiv 0 \mod p$ und $m \not\equiv 0 \mod p$.
+gilt weiterhin nur f"ur $m^{k(q-1)} \not\equiv 0 \mod p$.
 
 Wenn $m^{k(q-1)} \equiv 0 \mod p$, ist $p$ Teiler von $m^{k(q-1)}$.
 Da $m^{k(q-1)}$ nicht mehr verschiedene Faktoren als $m$ hat und $p$ als Primzahl
 genau einen Primfaktor hat, teilt $p$ auch $m$.
-Als Kongruenz geschrieben hei"st das: $m \equiv 0 \mod p$, also sind beide Ausnahmef"alle gleich.
+Als Kongruenz geschrieben hei"st das: $m \equiv 0 \mod p$.
 Es gilt ferner $m^{k(q-1)} \equiv 0 \equiv m \mod p$.
-Somit gilt f"ur alle $m \in \mathbb{N}$~\cite{rsa}:
+Somit gilt uneingeschr"ankt f"ur alle $m \in \mathbb{N}$~\cite{rsa}:
 \[m^{k\phi(n)+1} \equiv m \mod p\]
 
 Da aus $ed \equiv 1 \mod \phi(n)$ folgt, dass $ed = k\phi(n) +1$ f"ur ein $k \in \mathbb{N}$,%
@@ -294,31 +292,31 @@ die Ver- und Entschl"usselungsfunktionen also tats"achlich funktionieren~\cite{r
 \subsection{Verwendbarkeit f"ur digitale Unterschriften}
 
 Die Ver- und Entschl"usselungsfunktionen lassen sich offensichtlich
-auch verkehrt herum anwenden, ohne dass es zu Problemen kommt:
+auch verkehrt herum anwenden, ohne dass es zu Problemen kommt~\cite{rsa}:
 \[D(E(m)) = (m^e)^d = m^{ed} = (m^d)^e = E(D(m))\]
 Obwohl dies zur Aufbewahrung geheimer Informationen offensichtlich suboptimal ist,
 da der "offentliche Schl"ussel "offentlich sein soll, k"onnen damit Unterschriften erstellt werden.
-Da nur jemand mit Zugang zu einem privaten Schl"ussel eien Unterschrift $s = D(m)$ berechnen kann,
-kann man durch $E(s) = m$ verifizieren, dass $m$ tats"achlich vom
-Inhaber des privaten Schl"ussels verschickt wurde.
+Da nur jemand mit Zugang zu einem privaten Schl"ussel eine Unterschrift $s = D(m)$ berechnen kann,
+kann man durch Pr"ufen von $E(s) = m$ verifizieren, dass $m$ tats"achlich vom
+Inhaber des privaten Schl"ussels verschickt wurde~\cite{rsa}.
 
 \subsection{Sicherheit}
 
 Wenn man sich vorstellt, als Angreifer eine mit RSA verschl"usselte Nachricht
 lesen zu wollen, sucht man ein $d$, um $D(c)$ berechnen zu k"onnen.
-Bekannt sich als Teil des "offentlichen Schl"ussels sowohl $e$ als auch $n$.
+Bekannt sind als Teil des "offentlichen Schl"ussels sowohl $e$ als auch $n$.
 
 Ein Weg, $d$ zu berechnen, ist, wie bei der Schl"usselerstellung,
 den erweiterten Euklidschen Algorithmus auf $e$ und $\phi(n)$ anzuwenden.
 Obwohl mit $e$ schon eine dieser Komponenten bekannt ist, wird $\phi(n)$
 bei der Schl"usselerstellung mit $\phi(n) = n - p - q + 1$ berechnet,
-wozu offensichtlich $p$ und $q$ bn"otigt werden~\cite{rsa}.
+wozu offensichtlich $p$ und $q$ ben"otigt werden~\cite{rsa}.
 
-Aus $n$ (auch einem Angreifer bekannt) k"onnen $p$ und $q$ mittels der Faktoriserung ermittelt werden.
-Jedoch wird das Foktorisieren von Zahlen schon seit Jahrtausenden untersucht,
-ohne dass eine effiziente Methode gefunden wurde%
+Aus $n$ (auch einem Angreifer bekannt) k"onnen $p$ und $q$ durch Faktoriserung ermittelt werden.
+Jedoch wird das Faktorisieren von Zahlen schon seit Jahrtausenden untersucht,
+ohne dass eine effiziente Methode gefunden wurde.%
 \footnote{f"ur Quantencomputer existieren effiziente Algorithmen,
-jedoch wurden keine ausreichender Gr"o"se gebaut}.
+jedoch wurden keine ausreichender Gr"o"se gebaut}
 Das hei"st, dass es nach aktuellem Stand praktisch unm"oglich ist,
 Zahlen in der Gr"o"senordnung gel"aufiger Schl"usselgr"o"sen,\footnote{erweitertes Allgemeinwissen}
 also 2048 oder 4096 (seltener 8192) Bits (jeweils etwas "uber 600, 1200 und 2450 Dezimalstellen),
@@ -339,10 +337,12 @@ kann man davon ausgehen, dass es nicht leicht ist, $\phi(n)$ zu erhalten~\cite{r
 Trotz der "Aquivalenz (bzgl.\@ des Aufwands) zur Faktorisierung in diesem (und einigen\todo{eigentlich nur einer} weiteren,
 hier nicht aufgef"uhrten F"allen, die in~\cite{rsa} genannt werden),
 ist nicht automatisch jede Methode, die RSA bricht,
-es also einer Person ohne Zugang zum provaten Schl"ussel erlaubt, verschl"usselte Nachrichten zu lesen,
+es also einer Person ohne Zugang zum privaten Schl"ussel erlaubt,
+verschl"usselte Nachrichten zu lesen oder g"ultige Unterschriften zu erstellen,
 eine M"oglichkeit zur Faktorisierung von $n$~\cite{sinews}.
 
 \subsection{Komplettes Beispiel}
+\label{subsec:math:example}
 
 Als Primzahlen w"ahlen wir $p = 37$ und $q = 43$.
 Entsprechend ist $n = pq = 1591$ und $\phi(n) = n - p - q + 1 = 1512$.
@@ -381,7 +381,7 @@ Dies ist jedoch nur das leichteste Problem, wenn RSA praktisch implementiert wer
 \label{subsec:practical:exp}
 % Sonst w"are das alles viel zu langsam.
 
-Da man sowohl zum Ver- als auch zum Entschl"usseln $a^b \mod n$
+Da man sowohl zum Ver- und Entschl"usseln als auch f"ur Unterschriften $a^b \mod n$
 (jeweils mit Basis $m$ oder $c$ und Exponent $e$ oder $d$) berechnen muss,
 jedoch die jeweiligen Exponenten ($e$, $d$) in den allermeisten F"allen
 in der Gr"o"senordnung von mindestens f"unf Dezimaltellen liegen
@@ -389,7 +389,8 @@ in der Gr"o"senordnung von mindestens f"unf Dezimaltellen liegen
 und in \emph{jedem} TLS-RSA-Zertifikat, welches ich gesehen habe}
 "offentliche Exponent ist 65537),
 ist es notwendig, modulare Exponentiation zu optimieren,
-damit Ver- und Entschl"usselung praktikabel wird.
+damit die Operationen (Ver-/Entschl"usseln, Unterschriften erstellen/validieren)
+praktikabel durch\-f"uhr\-bar sind.
 
 Um modulare Exponentiation zu verschnellern, kann man entweder weniger Multiplikationen
 als $b-1$ durchf"uhren oder die durchgef"uhreten Multiplikationen schneller durchf"uhren.
@@ -441,7 +442,7 @@ die allerdings nur in Kombination mit einem komplexeren square-and-multiply n"ut
 In Python ist eine optimierte modulare Exponentiation als \lstinline{pow(a, b, n)} eingebaut.
 
 \paragraph{Beispiel}
-F"ur die Berechnung von $429^{89} \mod 1591$ mit der einfachen square-and-multiply-Varinte
+F"ur die Berechnung von $429^{89} \mod 1591$ mit der einfachen square-and-multiply-Variante
 mit eingebauter Reduktion f"uhrt man die folgenden Schritte aus.
 Dargestellt ist jeweils der Stand nach der Pr"ufung eines Bits und vor der Erh"ohung von \texttt{a},
 wobei sowohl \texttt{a} als auch \texttt{ergebnis} (Bezeichner aus Quellcodeauschnitt~\ref{code:square-and-multiply} "ubernommen)
@@ -464,17 +465,19 @@ Die bin"are Darstellung von $89$ ist $1011001_2$. \\
 \end{tabular}
 
 \subsection{Primzahlen finden}
+\label{subsec:practical:primes}
 % Vielleicht den Teil hier auch in den Matheteil schieben. Auf jeden Fall im Anhang andere M"oglichkeiten auflisten.
 Um Schl"ussel zu generieren, braucht man zun"achst Primzahlen.
 Um diese Primzahlen zu erhalten, ist es aufgrund der Gr"o"se
-(ab ca.\@ 1024 Bits bzw.\@ 308 Ziffern)
-inpraktikabel (darauf beruht die Sicherheit), alle Primzahlen zu finden.
+(mindestens ca.\@ 1024 Bits bzw.\@ 308 Ziffern)
+inpraktikabel (darauf beruht die Sicherheit),
+alle Primzahlen bis zu einer der richtigen Gr"o"se zu finden.
 Daher sieht die Prozedur zur Primzahlengeneration wie folgt aus~\cite{hac}:
 \begin{quote}
 \begin{itemize}
     \item Zuf"allige Zahl der gew"unschten Gr"o"se generieren
     \item Pr"ufen, ob die Zahl prim ist
-    \item Fortfahren, bis eine Primzahl gefunden wurde
+    \item Fortfahren, bis eine Primzahl gefunden wird
 \end{itemize}
 \end{quote}
 
@@ -494,7 +497,7 @@ wahrscheinliche Primzahlen findet und dann mit komplexeren Tests
 diese wenige Zahlen pr"uft~\cite{hac}.
 
 \subsubsection{Der Miller-Rabin-Test}
-Der Miller-Rabin-Test ist ein probabilistischer test, der "`nur"' beweisen kann,
+Der Miller-Rabin-Test ist ein probabilistischer Test, der "`nur"' beweisen kann,
 dass eine Zahl zusammengesetzt ist.
 Daf"ur wird die Tatsache verwendet, dass f"ur eine Primzahl $p = 2^s r+1$ mit $r, s \in \mathbb{N}$
 und eine zu $p$ relativ prime ganze Zahl $a$ entweder $a^r \equiv 1 \mod p$ oder
@@ -503,7 +506,7 @@ $a^{(2^j)r} \equiv -1 \mod p$ f"ur ein $j$ mit $0 \leq j \leq s-1$ gilt~\cite{ha
 Man pr"uft nun f"ur verscheidene zuf"allig gew"ahlte $a$, ob eine der Kongruenzen gilt.
 Dabei kann wegen $a^{(2^j)r} = (a^r)^{(2^j)}$ w"ahrend der "Uberpr"ufung von
 $a^{(2^j)r} \equiv -1 \mod p$ der Initialwert $a^r$ bei Erh"ohung von $j$ einfach quadriert werden,
-sodass insgesamt weniger Rechnungen ben"otigt werden~\cite{hac}.
+sodass insgesamt weniger Rechnungen als bei einer naiven Implementation ben"otigt werden~\cite{hac}.
 
 Gilt keine der Kongruenzen, wird angenommen, dass die Zahl prim ist.
 F"ur eine ungerade zusammengesetzte Zahl $n$ gilt,
@@ -547,7 +550,9 @@ Dazu teilt man sowiet wie m"oglich $n-1 = 8352$ durch 2:
 Daher ist $n-1 = 8352 = 2^5 \cdot 261$, also ist $s = 5$ und $r = 261$.
 
 Zun"achst w"ahlen wir zuf"allig $a = 6848$.
-Da $a^r = 6848^{261} = 3597 \mod 8353 \not\in \{1; 8352\}$, pr"ufen wir die anderen Kongruenzen:\\
+Da $a^r = 6848^{261} = 3597 \mod 8353 \not\in \{1; 8352\}$,
+-- mit $8352$ wird direkt $j = 0$ abgedeckt --
+pr"ufen wir die anderen Kongruenzen:\\
 
 \begin{tabular}{c|l}
     $j$ & $(a^r)^{(2^j)} \mod n$ \\
@@ -560,7 +565,7 @@ Da $a^r = 6848^{261} = 3597 \mod 8353 \not\in \{1; 8352\}$, pr"ufen wir die ande
 
 \noindent
 Da die Kongruenz gilt, kann es sein, dass es sich um eine Primzahl handelt,
-wir k"onnen es aber nicht mit Sicherheit sagen.
+wir k"onnen es aber nicht sicher sagen.
 
 Wir w"ahlen ein weiteres zuf"alliges $a = 5579$.
 Nun ist $a^r = 5579^{261} = 8352 \mod 8353 \in \{1; 8352\}$,
@@ -573,10 +578,10 @@ ist die Wahrscheinlichkeit, das $8353$ prim ist, mindestens:
 
 Durch noch mehr Iterationen des Tests kann die Wahrscheinlichkeit,
 eine zusammengesetzte Zahl nicht als solche zu erkennen,
-auf noch niedrigere Werte bringen:\\
+auf noch niedrigere Werte gebracht werden:\\
 
 \begin{tabular}{c|c}
-    Iterationen & Wahrscheinlichkeit (gerundet) \\
+    Iterationen & max.\@ Wahrscheinlichkeit (gerundet) \\
     \hline
     1 & $0,25$ \\
     5 & $9,766 \cdot 10^{-4}$ \\
@@ -589,9 +594,9 @@ auf noch niedrigere Werte bringen:\\
 % Warum man Padding benutzt. Entweder nur die f"ur OpenPGP benutzten Teile oder alles. Vielleicht auch nur die vorletzte Version.
 
 Auch wenn RSA wie oben beschrieben als sicher angenommen wird, kann es in der praktischen
-Anwendung beispielsweise bei kurzen Nachrichten zu Sicherheitsl"ucken kommen~\cite{sinews}.\todo{Auch komplett zitieren?}
+Anwendung beispielsweise bei kurzen Nachrichten zu Sicherheitsl"ucken kommen~\cite{sinews}. \todo{Auch komplett zitieren?}
 Um dies zu verhindern, wurde der sog.\@ Public-Key Cryptography Standard \#1 geschrieben,
-der das Format einer mit RSA Verschl"usselten Nachricht sowie einer RSA-Unterschrift festlegt.
+der das Format einer mit RSA verschl"usselten Nachricht sowie einer RSA-Unterschrift festlegt.
 
 Da fr"uhere Versionen nicht gegen alle Angriffe immun waren, ist der Standard
 im Laufe der Zeit weiterentwickelt worden~\cite{sinews}.
@@ -630,9 +635,10 @@ weshalb die Tests $z \equiv -1 \mod n$ als \verb|z % n == n-1| geschrieben werde
 
 Als Wiederholungszahl habe ich 128 festgelegt.
 So ist die Wahrscheinlichkeit, dass eine zusammengesetzte Zahl als prim erkl"art wird,
-$\frac{1}{2^{256}}$, was der Wahrscheinlichkit entspricht, einen AES-256%
-\footnote{Der symmetrische Algorithmus, der u.a.\@ von den USA f"ur streng geheime Informationen verwendet wird}%
--Schl"ussel beim ersten Versuch zu erraten.
+$\frac{1}{2^{256}}$, was der Wahrscheinlichkit entspricht, einen AES-256-Schl"ussel%
+\footnote{AES-256 ist der symmetrische Algorithmus,
+der u.a.\@ von den USA f"ur streng geheime Informationen verwendet wird}
+beim ersten Versuch zu erraten.
 
 \todo{Quellcode hier einf"ugen?}
 
@@ -643,21 +649,21 @@ Auch hier muss auf negative Werte (als Ergebnis des erweiterten Euklidschen Algo
 achtgegeben werden: Um einen postiven Wert f"ur $d$ zu erhalten, der die ben"otigte Kongruenz
 $ed \equiv 1 \mod \phi(n)$ erf"ullt, kann hier die Modulufunktion bzw.\@ der \verb|%|-Operator
 verwendet werden.
-Dabei lege ich f"ur $e$ 65537 fest.
+Dabei lege ich $e = 65537$ (aus in Abschnitt~\ref{subsec:practical:primes} genannten Effizienzgr"unden) fest.
 Die Berechnung von $\phi(n)$ ist ebenfalls direkt als $n - p - q + 1$ implementiert.
 
 \subsubsection{Ver- und Entschl"usselung, Unterschriften}
 Der grundlegene Ver- und Entschl"usseldungsprozess ist buchst"ablich:
 \lstinputlisting[firstnumber=57,firstline=57,lastline=59]{../openpgp/rsa.py}
-Da in jeder Verwendung Bytes verwendet werden, habe ich daf"ur eine die Konvertierung
+Da in jeder Anwendung Bytes verarbeitet werden, habe ich daf"ur eine die Konvertierung
 durchf"uhrende Wrapperfunktion, \lstinline{crypt_bytes}, geschrieben.
 
-F"ur Ver- und Entschl"usselung habe ich die entsprechenden En- und Dekodierungsverfahren
+F"ur Ver- und Entschl"usselung habe ich die entsprechenden En- und De\-codie\-rungs\-ver\-fah\-ren
 aus dem Standard implementiert.
-Die Unterschriften (sowohl Erstellung als auch Verifizierung) nahmen direkt den
-pr"akixierten Hash als Parameter.
-Bei den Unterschriften ist anzumerken, dass es nur eine Enkodierung gibt,
-da bei der Verifikation der entschl"usselte Wert mit dem kodierten Hash verglichen wird.
+Die Unterschriften (sowohl Erstellung als auch Verifizierung) nehmen direkt den
+pr"afixierten Hash als Parameter.
+Bei den Unterschriften ist anzumerken, dass es nur eine Encodierung gibt,
+da bei der Verifikation der entschl"usselte Wert mit dem encodierten Hash verglichen wird.
 
 \section{OpenPGP}
 \subsection{"Ubersicht}
@@ -668,38 +674,45 @@ Im Jahre 1991 ver"offentlichte\footnote{Aufgrund von rechtlichen Problemen
 (Exportbeschr"ankungen sowie Patentrechte der RSA Data Security) bestand die Ver"offentlichung daraus,
 dass ein Freund Zimmermanns die Software in einem Internet-Forum postete}
 Phil Zimmermann PGP ("`Pretty Good Privacy"'),
-um die bis dahin nur Regierungen und gro"sen Unternehmen verf"ugbare RSA-Verschl"usselung
+um die bis dahin nur Regierungen und gro"sen Unternehmen verf"ugbare RSA-Ver\-schl"us\-se\-lung
 auch f"ur die allgemeine Bev"olkerung praktikabel zu machen,
 indem er die komplexen Prozesse, die f"ur Schl"usselerstellung,
 Verschl"usselung von Nachrichten, digitale Unterschriften und Verwaltung von Schl"usseln
 notwendig sind, vereinfachte.
 Dabei dachte er vor allem an die Verwendung f"ur E-Mails~\cite{singh}.
 
-\todo{Zu viele "Uberschneidungen mit der Einleitung?}
 Auf Basis der PGP-Software ist inzwischen der OpenPGP-Standard geschaffen worden,
 der neben S/MIME (Secure/Multipurpose Internet Mail Extensions)
-eines der Hauptformate f"ur verschl"usselte und unterschriebene E-Mails ist.
+eines der Hauptformate f"ur verschl"usselte und digital unterschriebene E-Mails ist.
 Trotz dieser starken Nutzung eigent sich OpenPGP durchaus f"ur die Verschl"usselung
 von station"aren Daten.
 Es gibt ebenfals einen Modus f"ur symmetrische Verschl"usselung mit Passwort~\cite{rfc4480}.
 
 Der asymmetrische Verschl"usselungsmodus besteht tats"achlich aus einer sog.\@ "`hybriden"'
-Verschl"usselung \todo{Bild?}, d.h.\@, dass die eigentlichen Daten zun"achst symmetrisch verschl"usselt werden
-und dann der symmetrische Schl"ussel asymmetrisch verschl"usselt wird.
+Verschl"usselung, d.h.\@, dass die eigentlichen Daten zun"achst symmetrisch ver\-schl"us\-selt werden
+und dann der symmetrische Schl"ussel asymmetrisch ver\-schl"us\-selt wird,
+wie in Abbildung~\ref{fig:hybrid_crypto} dargestellt.
 OpenPGP erlaubt so die gleichzeitige Verschl"usselung an mehrere Empf"anger%
-\footnote{In parktischer Anwendung bei E-Mails wird man als Absender auch sich selbst
+\footnote{In praktischer Anwendung bei E-Mails wird man als Absender auch sich selbst
 als Empf"anger eintragen bzw.\@ dies automatisch durch die Software machen lassen,
 damit man auch verschickte E-Mails lesen kann.}
-und die bereits erw"ahnte Passwort-Verschl"usselung~\cite{rfc4480}.
-\todo{Spezifische Beispiele f"ur Alogrithmen?}
+und die bereits erw"ahnte Passwort-Ver\-schl"us\-se\-lung~\cite{rfc4480}.
 
-Neben Unterschriften "uber Daten sieht OpenPGP auch Unterschriften "uber Schl"ussel vor,
-die entweder einem Hauptschl"ussel erlauben, Unterschl"ussl an sich zu binden oder
+\begin{figure}
+    \includegraphics[width=\textwidth]{hybrid.png}
+    \caption{Schema zur hybriden Kryptographie.
+    Eine Nachricht wird von links nach rechts "uber ein unsicheres Medium (z.B.\@ Internet) verschickt.
+    Wie der "offentliche asymmetrische Schl"ussel (sicher) verteilt wird, ist nicht dargestellt.}
+    \label{fig:hybrid_crypto}
+\end{figure}
+
+Neben Unterschriften "uber Daten sieht OpenPGP auch Unterschriften "uber Schl"us\-sel vor,
+die entweder einem Hauptschl"ussel erlauben, Unterschl"ussel an sich zu binden oder
 einer Person erlauben, die Genauigkeit einer "`User ID"', also der Zuordnung eines Schl"ussels
 zu einer realen Person, zu best"atigen~\cite{rfc4480}.
 Letztere erlauben es, ohne direkten (pers"onlichen) Austausch von Schl"usseln mit Personen
 verschl"usselt zu kommunizieren, indem man erhaltene Schl"ussel "uber Unterschriften
-durch Personen, die man bereits kennt, validiert.
+durch Personen, die man bereits kennt, validiert. \todo{Bild?}
 
 OpenPGP definiert 17 verschiedene "`Packets"',%
 \footnote{Die komplette Liste ist entweder mit Erkl"arungen im Standard~\cite{rfc4480}
@@ -712,7 +725,15 @@ So w"urde beispielsweise eine an zwei Personen verschl"usselte und unterschriebe
 zwei Packets mit dem asymmetrisch verschl"usselten symmetrischen Schl"ussel und einem Packet mit
 verschl"usselten Daten, welches aus Packets f"ur die Datei und die Unterschrift
 (sowie ggf.\@ einem weiteren Packet, welches Modifikationen der verschl"usselten Daten erkennbar machen soll)
-besteht, enthalten. \todo{Bild?}
+besteht, enthalten.
+Siehe zu diesem Beispiel auch Abbildung~\ref{fig:example_openpgp_format}.
+
+\begin{figure}
+    \centering
+    \includegraphics[height=0.3\textheight]{example_openpgp_format.png}
+    \caption{Packets in einer an zwei Personen verschl"usselten und unterschriebenen Nachricht.}
+    \label{fig:example_openpgp_format}
+\end{figure}
 
 \subsection{Meine Implementation}
 %Was habe ich implementiert? Auf die hybride Krypto eingehen (AES als Unterpunkt?). Wenn erlaubt/noch Seiten "ubrig, auch auf Datenstrukturen eingehen (die wohl eher Richtung Mathe gehen als Packet-Format lesen usw.)
@@ -773,7 +794,7 @@ Public Key b91294876bd058ff9abce9809ad2041a28dc342d
 Es werden alle User IDs angezeigt, man sieht, dass zum ersten Schl"ussel auch der private Teil verf"ugbar ist (\texttt{Key Pair}).
 Die Unterschriften bez"uglich der Verifizierung (\texttt{POSITIVE\_UID}/\texttt{GENERIC\_UID})
 und der Unterschl"usselbindung (\texttt{SUBKEY\_BIND}) werden angezeigt.
-Eine Unterschrift stammt von einem unbakannten Schl"ussel und wird daher nicht angezeigt.
+Eine Unterschrift stammt von einem unbekannten Schl"ussel und wird daher nicht angezeigt.
 Im Folgenden wird diese Warnung weggelassen.
 
 \paragraph{Einlesen von Nachrichten}~\\
@@ -792,7 +813,7 @@ Messages:
         TEXT signature (RSA/SHA512) by 0bca1709a0c297a5fa8e8e6850587fe80adf2136, created 2020-08-22 19:21:28, exportable, revocable
 \end{lstlisting}
 Zum Speichern von Nachrichten werden diesen zum STDOUT geschrieben.
-Durch Umleitung kann man sie in Dateien Speichern.
+Durch Umleitung kann man sie in Dateien speichern.
 \begin{lstlisting}
 $ python3 -m openpgp --load data/text-message save-message
 Hello there.
@@ -805,7 +826,7 @@ Bye!
 \paragraph{Erstellen von Nachrichten}
 Um eine Datei zu unterschrieben und verschl"usseln, muss man:
 \begin{enumerate}
-    \item Die Datei (hier \texttt{/bin/true}) ins OpenPGP-FOrmat konvertieren
+    \item Die Datei (hier \texttt{/bin/true}) ins OpenPGP-Format konvertieren
     \item Die Datei mit dem/den eigenen privaten Schl"ussel(n) unterschrieben
     \item Die Datei verschl"usseln, wobei die eigentliche Datei symmetrisch
         und nur der symmetrische Schl"ussel asymmetrisch verschl"usselt wird.
@@ -842,7 +863,7 @@ $ sha256sum /bin/true /tmp/decrypted-true
 \end{lstlisting}
 
 \paragraph{Was nicht funktioniert}~\\
-Ohne privaten schl"ussel ist offensichtlich sowohl unterschreiben als auch entschl"usseln unm"oglich:
+Ohne privaten Schl"ussel ist offensichtlich sowohl Unterschreiben als auch Entschl"usseln unm"oglich:
 \begin{lstlisting}
 $ python3 -m openpgp pgpify /bin/true | python -m openpgp -l- encrypt --recipient 'Key 2' | python -m openpgp -l- info
 2020-09-24 16:49:18,713 - ERROR(openpgp.parse): No session key. Encrypted for: ['9ad2041a28dc342d']
@@ -879,16 +900,19 @@ jedoch sind Leser eingeladen, auch "uber andere bzw.\@ verbesserte Ans"atze
 in Kapitel 14.6 der Quelle~\cite{hac} zu lesen.
 
 Primzahlen, von ihrer mathematischen Natur aus eines der abstraktesten Themen,
-sind durch asymmetrische Kryptographie wichtig in der parktiscehn Anwendung geworden.
-\todo{Zitat dazu}
+sind durch asymmetrische Kryptographie wichtig in der praktischen Anwendung geworden.
+Insgesamt hat die Zahlentheorie durch asymmetrische Kryptographie enorm an praktischer Bedeutung gewonnen.
 
-\todo{OpenPGP}
-
-Obwohl derzeit auf elliptischen Kurven (auch eine sehr anstrakt methematische Grundlage)
+Obwohl derzeit auf elliptischen Kurven (auch eine sehr abstrakte methematische Grundlage)
 basierende asymmetrische Kryptographie st"arker verwendet wird,
 ist absehbar, dass RSA f"ur die breiten Bev"olkerungsmassen als Bestandteil
 der TLS-Rootzertifikate in Webbrowsern noch Jahre und in speziellen Anwendungen m"oglicherweise
 noch Jahrzehnte relevant bleiben wird.
+
+W"ahrend OpenPGP selbst f"ur die meisten Menschen nur indirekt relevant ist,
+z.B.\@ "uber GPG-unterschriebene git-Tags neuer Linux-Versionen, welche die Grundlage f"ur Android bilden,
+sind die allgemeinen Konzepte beispielsweise bez"uglich hybrider Kryptographie allgemein
+auf viele praktische Anwendungen direkt "ubertragbar.
 
 \appendix
 
