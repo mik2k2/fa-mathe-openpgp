@@ -356,13 +356,13 @@ Mittels des erweiterten Euklidschen Algorithmus erhalten wir:\\
     2 & 0 & 0 & 1 & 1512 & 1 & 0 & 17 \\
     3 & 88 & 1 & 0 & 17 & -88 & 1 & 16 \\
     4 & 1 & -88 & 1 & 16 & 89 & -1 & 1 \\
-    5 & 16 & 89 & -1 & 1 & 1512 & 17 & 0 \\
+    5 & 16 & 89 & -1 & 1 & -1512 & 17 & 0 \\
 \end{tabular}
 ~\\~\\
 \noindent
 Der GGT ist tats"achlich 1, d.h.\@ $e$ und $\phi(n)$ sind teilerfremd, wie nach~\eqref{eq:ed_prime_phi_n} notwendig.
 Den Wert f"ur $d$ erhalten wir nach~\eqref{eq:d_is_s}: $d = s_1 = 89$.
-Somit sind beide Schl"ussel bestimmt: der "offentliche ist $(e, n) = (17, 1591)$, der private $(d, n) = (89, 1591)$.
+Somit sind beide Schl"ussel be\-stimmt: der "offentliche ist $(e, n) = (17, 1591)$, der private $(d, n) = (89, 1591)$.
 
 Mit diesen Schl"usseln k"onnen wir nun eine Nachricht verschl"usseln, z.b.\@ $m = 42$.
 Die verschl"usselte Version ist \[c = E(m) = m^e = 42^{17} = 429 \mod 1591\]
@@ -373,7 +373,7 @@ Um die Nachricht zu entschl"usseln, berechnen wir
 % Bytes kann man einfach in Zahlen umwandeln, aber es geh"ort noch etwas mehr dazu
 
 Ein offensichtlicher Unterschied zwischen den mathematischen Funktionen,
-die RSA ausmachen, und praktischer Anwending ist, dass man praktisch entweder Dateien
+die RSA ausmachen, und praktischer Anwendung ist, dass man praktisch entweder Dateien
 oder Text und nicht Zahlen verschl"usseln will.
 Dies ist jedoch nur das leichteste Problem, wenn RSA praktisch implementiert werden soll.
 
@@ -383,11 +383,8 @@ Dies ist jedoch nur das leichteste Problem, wenn RSA praktisch implementiert wer
 
 Da man sowohl zum Ver- und Entschl"usseln als auch f"ur Unterschriften $a^b \mod n$
 (jeweils mit Basis $m$ oder $c$ und Exponent $e$ oder $d$) berechnen muss,
-jedoch die jeweiligen Exponenten ($e$, $d$) in den allermeisten F"allen
-in der Gr"o"senordnung von mindestens f"unf Dezimaltellen liegen
-(der meistgenutzte\footnote{In GnuPG und OpenSSL Defaultwert,
-und in \emph{jedem} TLS-RSA-Zertifikat, welches ich gesehen habe}
-"offentliche Exponent ist 65537),
+jedoch einer der jeweiligen Exponenten ($e$, $d$) in den allermeisten F"allen
+sehr gro"s ist (der berechnete kann bis zu $\phi(n)$ gehen),
 ist es notwendig, modulare Exponentiation zu optimieren,
 damit die Operationen (Ver-/Entschl"usseln, Unterschriften erstellen/validieren)
 praktikabel durch\-f"uhr\-bar sind.
@@ -402,7 +399,7 @@ In der einfachsten Form werden dabei alle $a^{(2^i)}$ multipliziert,
 f"ur die das Bit an der Stelle $i$ (wobei von rechts nach links und mit 0 beginnend gez"ahlt wird)
 in der bin"aren Darstellung von $b$ gleich $1$ ist.
 Da man die Werte $a^{(2^i)}$ erhalten kann, indem man in jedem Schritt $a$ quadriert,
-und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.~Quellcodeausschnitt~\ref{code:square-and-multiply})
+und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.~Quell\-code\-aus\-schnitt~\ref{code:square-and-multiply})
 wird hier wiederholt quadriert und multipliziert.
 Von diesem grundlegenen Algorithmus existieren Abwandlungen,
 die durch noch weniger Multiplikationen mehr Effizienz erreichen.
@@ -445,7 +442,7 @@ In Python ist eine optimierte modulare Exponentiation als \lstinline{pow(a, b, n
 F"ur die Berechnung von $429^{89} \mod 1591$ mit der einfachen square-and-multiply-Variante
 mit eingebauter Reduktion f"uhrt man die folgenden Schritte aus.
 Dargestellt ist jeweils der Stand nach der Pr"ufung eines Bits und vor der Erh"ohung von \texttt{a},
-wobei sowohl \texttt{a} als auch \texttt{ergebnis} (Bezeichner aus Quellcodeauschnitt~\ref{code:square-and-multiply} "ubernommen)
+wobei sowohl \texttt{a} als auch \texttt{ergebnis} (Bezeichner aus Quellcodeausschnitt~\ref{code:square-and-multiply} "ubernommen)
 als Potenz von $429$ und reduziert $\mod 1591$ gezeigt werden.
 Die bin"are Darstellung von $89$ ist $1011001_2$. \\
 
@@ -453,14 +450,14 @@ Die bin"are Darstellung von $89$ ist $1011001_2$. \\
     $i$ & Bit & \texttt{ergebnis} & \texttt{ergebnis} (red.\@) & \texttt{a} & \texttt{a} (red.\@) & Multiplikationen\\
     \hline
     \hline
-    -- & -- & $1$ & $429$ & $429$ & $429$ & 0 \\
+    -- & -- & $1$ & $1$ & $429$ & $429$ & 0 \\
     \hline
-    0 & 1 & $429$ & $429$ & $429$ & $1076$ & 2 \\
-    1 & 0 & $429$ & $429$ & $429^2$ & $1119$ & 3 \\
-    2 & 0 & $429$ & $429$ & $429^4$ & $44$ & 4 \\
-    3 & 1 & $429 \cdot 429^8 = 429^9$ & $1375$ & $429^8$ & $345$ & 6 \\
-    4 & 1 & $429^9 \cdot 429^{16} = 429^{25}$ & $257$ & $429^{16}$ & $1291$ & 8 \\
-    5 & 0 & $429^{25}$ & $257$ & $429^{32}$ & $904$ & 9 \\
+    0 & 1 & $429$ & $429$ & $429$ & $1076$ & 1 \\
+    1 & 0 & $429$ & $429$ & $429^2$ & $1119$ & 2 \\
+    2 & 0 & $429$ & $429$ & $429^4$ & $44$ & 3 \\
+    3 & 1 & $429 \cdot 429^8 = 429^9$ & $1375$ & $429^8$ & $345$ & 5 \\
+    4 & 1 & $429^9 \cdot 429^{16} = 429^{25}$ & $257$ & $429^{16}$ & $1291$ & 7 \\
+    5 & 0 & $429^{25}$ & $257$ & $429^{32}$ & $904$ & 8 \\
     6 & 1 & $429^{89}$ & $42$ & $429^{64}$ & $1033$ & 10 \\
 \end{tabular}
 
@@ -483,7 +480,8 @@ Daher sieht die Prozedur zur Primzahlengeneration wie folgt aus~\cite{hac}:
 
 Zur Pr"ufung einer Primzahl existieren viele verschiedene Algorithmen.
 Sie lassen sich grob in zwei Gruppen einteilen:
-die probabilistischen, die mehrfach pr"ufen, ob eine Zahl zusammengesetzt ist,
+die probabilistischen,\footnote{Der Zusammenhang zwischen Zufallsabh"angigkeit und Zusammengesetztheits-
+oder Primzahltest ist nur eine Beobachtung} die mehrfach pr"ufen, ob eine Zahl zusammengesetzt ist,
 und nach einer bestimmten Anzahl an Wiederholungen annehmen, dass die Zahl prim ist,
 und die "`echten"', die tats"achlich beweisen k"onnen, dass eine Zahl prim ist~\cite{hac}.
 
@@ -603,15 +601,15 @@ im Laufe der Zeit weiterentwickelt worden~\cite{sinews}.
 OpenPGP basiert jedoch noch auf Version 1.5, sodass ich im Folgenden diese Version erl"autere~\cite{rfc4480}.
 
 Vor dem Verschl"usseln wird eine Nachricht mit den Bytes \verb|00 02|
-(zur Erkennung, dass die Nachricht wie folgt foratiert ist),
+(zur Erkennung, dass die Nachricht wie folgt formatiert ist),
 so vielen nicht genullten Bytes wie m"oglich (sodass der Gesamtwert unter $n$ bleibt)
-und einen \verb|00|-Byte (um das Ende der zuf"allien Bytes zu erkennen) pr"afixiert.
+und einen \verb|00|-Byte (um das Ende der zuf"alligen Bytes zu erkennen) pr"afixiert.
 Dies vergr"o"sert die der Nachricht entsprechende Zahl und verhindert,
 dass kurze Nachrichten Sicherheitsprobleme darstellen~\cite{rfc4480,sinews}.
 
 Bei Unterschriften wird nicht die zu unterschreibende Nachricht selbst,
 sondern ein sog.\@ "`hash"' oder "`Streuwert"', ein der Nachricht eindeutig zugeordneter Wert,
-der idealerweise (sonst k"onnen Unterschriften gef"alscht werden) m"oglichst kollisionsresistent ist,
+der idealerweise (sonst k"onnen Unterschriften gef"alscht werden) m"oglichst kol\-li\-si\-ons\-re\-sis\-tent ist,
 mathematisch unterschrieben.
 Auch hierbei werden zus"atzliche Bytes angef"ugt: erst \verb|00 01|, dann zuf"allig gew"ahlte, nicht genullte Bytes,
 \verb|00| und, zus"atzlich zum Format f"ur Verschl"usselung, eine den Hashalgorithmus identifizierende konstante Bytefolge.
@@ -639,8 +637,6 @@ $\frac{1}{2^{256}}$, was der Wahrscheinlichkit entspricht, einen AES-256-Schl"us
 \footnote{AES-256 ist der symmetrische Algorithmus,
 der u.a.\@ von den USA f"ur streng geheime Informationen verwendet wird}
 beim ersten Versuch zu erraten.
-
-\todo{Quellcode hier einf"ugen?}
 
 \subsubsection{Schl"usselerstellung}
 Mit gefundenen Primzahlen erstelle ich "uber die im mathematischen Teil genannten Schritte
@@ -712,7 +708,7 @@ einer Person erlauben, die Genauigkeit einer "`User ID"', also der Zuordnung ein
 zu einer realen Person, zu best"atigen~\cite{rfc4480}.
 Letztere erlauben es, ohne direkten (pers"onlichen) Austausch von Schl"usseln mit Personen
 verschl"usselt zu kommunizieren, indem man erhaltene Schl"ussel "uber Unterschriften
-durch Personen, die man bereits kennt, validiert. \todo{Bild?}
+durch Personen, die man bereits kennt, validiert.
 
 OpenPGP definiert 17 verschiedene "`Packets"',%
 \footnote{Die komplette Liste ist entweder mit Erkl"arungen im Standard~\cite{rfc4480}
@@ -720,7 +716,7 @@ oder ohne weitere Erl"auterung in \texttt{openpgp/common.py} ab Zeile 200 zu fin
 die von "offentlichen oder privaten Schl"usseln "uber
 "`User IDs"' bis zu verschl"usselten Daten verschiedensten Inhalt haben k"onnen.
 Ein OpenPGP-formatierter Datensatz (also z.B.\@ eine verschl"usselte Nachricht, eigene private Schl"ussel,
-"offentliche Schl"ussel von Bekannten, usw.\@) besteht aus einer Folge dieser Packets~\cite{rfc4480}.
+"offentliche Schl"ussel von Bekannten, usw.\@) be\-steht aus einer Folge dieser Packets~\cite{rfc4480}.
 So w"urde beispielsweise eine an zwei Personen verschl"usselte und unterschriebene Datei im OpenPGP-Format
 zwei Packets mit dem asymmetrisch verschl"usselten symmetrischen Schl"ussel und einem Packet mit
 verschl"usselten Daten, welches aus Packets f"ur die Datei und die Unterschrift
