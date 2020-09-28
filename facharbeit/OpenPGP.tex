@@ -12,6 +12,8 @@
 \usepackage{amsfonts}
 \reversemarginpar
 
+\hyphenation{Prim-zah-len}
+
 \lstset{
 language=Python,
 numbers=left,
@@ -23,7 +25,7 @@ numberstyle=\tiny\color{gray},
 commentstyle=\color{teal},
 stringstyle=\color{purple},
 title=\lstname,
-captionpos=b,
+captionpos=n,
 }
 \lstdefinelanguage{none}{
   identifierstyle=
@@ -100,10 +102,10 @@ hin zur praktischen Anwendung ersichtlich werden.
 %Hier wahrscheinlich sehr viel aus dem RSA-Paper zitieren.
 
 Mathematisch betrachtet man eine Nachricht als eine Zahl und einen
-Ver\-schl"us\-sel\-ungs\-al\-go\-rith\-mus als zwei Funktionen.
-Eine, im Folgenden $E(m)$, verwandelt unter Zuhilfenahme eines Schl"ussels eine
+Ver\-schl"us\-sel\-ungs\-sys\-tem als zwei Funktionen.
+Eine, im Folgenden $E(m)$, verwandelt unter Zuhilfenahme eines (sog.\@ "`"offentlichen"') Schl"ussels eine
 Nachricht in chiffrierten Text, eine zweite, im Folgenden $D(c)$,
-verwandelt unter Zuhilfenahme eines anderen Schl"ussels -- dies ist der asymmetrische Teil --
+verwandelt unter Zuhilfenahme eines anderen (sog.\@ "`privaten"') Schl"ussels -- dies ist der asymmetrische Teil --
 den chiffrierten Text in die urspr"ungliche Nachricht.
 Es gilt also $m = D(E(m))$.
 Anders ausgedr"uckt: $D$ ist Umkehrfunktion von $E$~\cite{rsa}.
@@ -114,11 +116,13 @@ Anders ausgedr"uckt: $D$ ist Umkehrfunktion von $E$~\cite{rsa}.
 
 Ein "offentlicher Schl"ussel besteht aus einem Paar nat"urlicher Zahlen $(e, n)$,
 ein privater aus einem Paar nat"urlicher Zahlen $(d, n)$.
-Dabei gilt, dass $n = pq$, das Produkt zweier ausreichend gro"ser Primzahlen~\cite{rsa}.
+Dabei gilt, dass $n = pq$, das Produkt zweier (ausreichend gro"ser)%
+\footnote{Weshalb die Primzahlen gro"s sein sollten, wird in Abschnitt~\ref{subsec:math:security} erkl"art}
+Primzahlen und dass $ed \equiv 1 \mod \phi(n)$,
+wobei $\phi$ die eulersche Phi-Funktion darstellt, die nachfolgend
+(in Abschnitt~\ref{subsubsec:math:keys:phi}) n"aher erl"autert wird~\cite{rsa}.
 
-F"ur $e$ und $d$ gilt aus nachfolgend genannten Gr"unden, dass $ed \equiv 1 \mod \phi(n)$,
-wobei $\phi$ die eulersche Phi-Funktion darstellt, die nachfolgend n"aher erl"autert wird~\cite{rsa}.
-Damit diese Kongruenz gelten kann, m"ussen $e$ und $d$ relativ prim zu $\phi(n)$ sein.
+Damit die Kongruenz $ed \equiv 1 \mod \phi(n)$ gelten kann, m"ussen $e$ und $d$ relativ prim zu $\phi(n)$ sein.
 Dies kann mittels des Widerspruchsbeweises gezeigt werden:
 Wenn $d$ (analog f"ur $e$) einen gemeinsamen Faktor $f > 1 \in \mathbb{N}$ mit $\phi(n)$ teilte, m"usste Folgendes gelten:
 \begin{equation}
@@ -126,7 +130,7 @@ Wenn $d$ (analog f"ur $e$) einen gemeinsamen Faktor $f > 1 \in \mathbb{N}$ mit $
 \begin{aligned}
 &d = fa ~~;~~ \phi(n) = fb && \textrm{ mit } a, b \in \mathbb{N} \\
 &efa \equiv 1 \mod fb \\
-&efa = kfb + 1 && \textrm{f"ur ein bestimmtes } k \in \mathbb{N} \\
+&efa = kfb + 1 && \textrm{f"ur ein } k \in \mathbb{Z} \\
 &ea = kb + \frac{1}{f} & \lightning &
 \end{aligned}
 \end{equation}
@@ -138,6 +142,7 @@ ist es am einfachsten, einen geeigneten Wert f"ur $e$ auszusuchen (siehe dazu~\r
 und dann mittels des erweiterten Euklidschen Algorithmus (siehe~\ref{subsubsec:math:euclid}) $d$ zu berechnen.
 
 \subsubsection{Die eulersche Phi-Funktion}
+\label{subsubsec:math:keys:phi}
 Die eulersche Phi-Funktion $\phi(n)$ ordnet einer nat"urlichen Zahl $n$ die Anzahl
 der nat"urlichen Zahlen kleiner gleich $n$, die relativ prim zu $n$ sind, zu.
 F"ur eine Primzahl $p$ ist trivialerweise $\phi(p) = p-1$,
@@ -150,13 +155,13 @@ F"ur ein Produkt zweier Primzahlen $p$ und $q$ ist nach Euler~\cite{euler63}:
 Der einfache Euklidsche Algorithmus kann zur Berechnung des gr"o"sten gemeinsamen
 Teilers zweier Zahlen $a_0, b_0$ verwendet werden.
 Speichert man einige weitere Zahlen, erh"alt man auch zwei ganze Zahlen $s, t$, sodass~\cite{taocp2}:
-\begin{equation}\label{eq:euclid} sa_0 + tb_0 = \textrm{ggt}(a_0, b_0) \end{equation}
+\begin{equation}\label{eq:euclid} sa_0 + tb_0 = \textrm{ggT}(a_0, b_0) \end{equation}
 
 Der Algorithmus selbst besteht (bei geeigneter Z"ahlweise) aus drei Schritten.
 Eingaben sind zwei nat"urliche Zahlen $a_0, b_0$~\cite{taocp2}:
 \begin{enumerate}
     \item Setze $s_1 \gets 1$, $s_2 \gets 0$, $t_1 \gets 0$, $t_2 \gets 1$, $a \gets a_0$, $b \gets b_0$
-    \item Falls $b = 0$: Beende, es gilt: $\textrm{ggt}(a_0, b_0) = a = s_1 a_0 + t_1 b_0$
+    \item Falls $b = 0$: Beende, es gilt: $\textrm{ggT}(a_0, b_0) = a = s_1 a_0 + t_1 b_0$
     \item Berechne die Ganzzahldivision $q = \floor{\frac{a}{b}}$ und setze zeitgleich:
     \begin{itemize}
         \item $a \gets b$, $b \gets a - bq$
@@ -165,6 +170,7 @@ Eingaben sind zwei nat"urliche Zahlen $a_0, b_0$~\cite{taocp2}:
     \end{itemize}
 \end{enumerate}
 
+\newpage
 \paragraph{Beispiel nach~\cite{taocp2}}
 Mit $a_0 = 40902$ und $b_0 = 24140$.
 Dargestellt ist jeweils der Stand nach Ausf"uhrung des zweiten Schritts.\\
@@ -184,15 +190,15 @@ Dargestellt ist jeweils der Stand nach Ausf"uhrung des zweiten Schritts.\\
 \end{tabular}
 ~\\~\\
 \noindent
-Tats"achlich ist $337 \cdot 40902 - 571 \cdot 24140 = 34 = \textrm{ggt}(40902, 24140)$~\cite{taocp2}.
+Tats"achlich ist $337 \cdot 40902 - 571 \cdot 24140 = 34 = \textrm{ggT}(40902, 24140)$~\cite{taocp2}.
 
 \paragraph{Verwendbarkeit f"ur RSA}
 
 Um ein $d$ zu bestimmen, wenn $ed \equiv 1 \mod \phi(n) $ und $e$ sowie $\phi(n)$ bekannt (bzw.\@ gew"ahlt) sind,
 kann der erweiterte Euklidsche Algorithmus auf $e$ und $\phi(n)$ angewandt werden.
-Weil $\phi(n)$ und $e$ wie im Widerspruch~\eqref{eq:ed_prime_phi_n} gezeigt relativ prim zueinander sind, ist ihr GGT gleich eins.
-Somit gilt nach~\eqref{eq:euclid} f"ur die beiden weiteren vom Algorithmus ausgegebenen Zahlen $s_1, t_1$,
-im Folgenden nur $s$ und $t$, dass $se + t\phi(n) = 1$.
+Weil $\phi(n)$ und $e$ wie im Widerspruch~\eqref{eq:ed_prime_phi_n} gezeigt relativ prim zueinander sind, ist ihr ggT gleich eins.
+Somit gilt nach~\eqref{eq:euclid} $se + t\phi(n) = 1$, wobei $s, t$ die von Algorithmus ausgegebenen
+Zahlen, also die letzten Werte von $s_1, t_1$ sind.
 
 \noindent Mit diesen Grundlagen k"onnen die folgenden "Aquivalenzen aufgestellt werden:
 \begin{equation}
@@ -203,7 +209,7 @@ im Folgenden nur $s$ und $t$, dass $se + t\phi(n) = 1$.
       &&=&~se + t\phi(n) + k\phi(n)& \\
       &&=&~se + (t+k)\phi(n) &\\
       \iff& ed &\equiv&~se \mod \phi(n) &\textrm{da }t+k\textrm{ eine ganze Zahl ist}\\
-      \iff& d &\equiv&~s \mod \phi(n)
+      \iff& d &\equiv&~s \mod \phi(n)& \textrm{da }\phi(n), e\textrm{ teilerfremd sind}
 \end{aligned}
 \end{equation}
 
@@ -233,7 +239,8 @@ D(c) = c^d \mod n
 \]
 
 \noindent
-Die G"ultigkeit dieser Funktionen wird nun erl"autert.
+Es wird nun gezeigt, dass $D(E(m)) = m$, dass also diese Funktionen f"ur asymmetrische Verschl"usselung
+verwendet werden k"onnen.
 
 Nach Euler gilt $a^{b-1} \equiv 1 \mod b$ f"ur alle $b \in \mathbb{P}$ und $a \in \mathbb{N}$,
 wenn $a$ nicht durch $b$ teilbar ist, also $a \not\equiv 0 \mod b$~\cite{euler41}.
@@ -301,6 +308,7 @@ kann man durch Pr"ufen von $E(s) = m$ verifizieren, dass $m$ tats"achlich vom
 Inhaber des privaten Schl"ussels verschickt wurde~\cite{rsa}.
 
 \subsection{Sicherheit}
+\label{subsec:math:security}
 
 Wenn man sich vorstellt, als Angreifer eine mit RSA verschl"usselte Nachricht
 lesen zu wollen, sucht man ein $d$, um $D(c)$ berechnen zu k"onnen.
@@ -320,7 +328,7 @@ jedoch wurden keine ausreichender Gr"o"se gebaut}
 Das hei"st, dass es nach aktuellem Stand praktisch unm"oglich ist,
 Zahlen in der Gr"o"senordnung gel"aufiger Schl"usselgr"o"sen,\footnote{erweitertes Allgemeinwissen}
 also 2048 oder 4096 (seltener 8192) Bits (jeweils etwas "uber 600, 1200 und 2450 Dezimalstellen),
-zu Faktorisieren~\cite{sinews}.
+zu faktorisieren~\cite{sinews}.
 
 Jeder andere Weg, $\phi(n)$ zu erhalten, ist in etwa so aufwendig wie $n$ zu faktorisieren,
 da folgenderma"sen aus Kenntnis von $\phi(n)$ (und $n$) sowhol $p$ als auch $q$ berechnet werden k"onnen:
@@ -334,7 +342,7 @@ Da dieser Ansatz zur Faktorisierung h"ochstwahrscheinlich ausgenutzt worden w"ar
 wenn die Berechnung von $\phi(n)$ leichter w"are, als $n$ zu sonstwie faktorisieren,
 kann man davon ausgehen, dass es nicht leicht ist, $\phi(n)$ zu erhalten~\cite{rsa}.
 
-Trotz der "Aquivalenz (bzgl.\@ des Aufwands) zur Faktorisierung in diesem (und einigen\todo{eigentlich nur einer} weiteren,
+Trotz der "Aquivalenz (bzgl.\@ des Aufwands) zur Faktorisierung in diesem (und einigen weiteren,
 hier nicht aufgef"uhrten F"allen, die in~\cite{rsa} genannt werden),
 ist nicht automatisch jede Methode, die RSA bricht,
 es also einer Person ohne Zugang zum privaten Schl"ussel erlaubt,
@@ -360,11 +368,11 @@ Mittels des erweiterten Euklidschen Algorithmus erhalten wir:\\
 \end{tabular}
 ~\\~\\
 \noindent
-Der GGT ist tats"achlich 1, d.h.\@ $e$ und $\phi(n)$ sind teilerfremd, wie nach~\eqref{eq:ed_prime_phi_n} notwendig.
+Der ggT ist tats"achlich 1, d.h.\@ $e$ und $\phi(n)$ sind teilerfremd, wie nach~\eqref{eq:ed_prime_phi_n} notwendig.
 Den Wert f"ur $d$ erhalten wir nach~\eqref{eq:d_is_s}: $d = s_1 = 89$.
 Somit sind beide Schl"ussel be\-stimmt: der "offentliche ist $(e, n) = (17, 1591)$, der private $(d, n) = (89, 1591)$.
 
-Mit diesen Schl"usseln k"onnen wir nun eine Nachricht verschl"usseln, z.b.\@ $m = 42$.
+Mit diesen Schl"usseln k"onnen wir nun eine Nachricht verschl"usseln, z.B.\@ $m = 42$.
 Die verschl"usselte Version ist \[c = E(m) = m^e = 42^{17} = 429 \mod 1591\]
 Um die Nachricht zu entschl"usseln, berechnen wir
 \[m = D(c) = c^d = 429^{89} = 42 \mod 1591\]
@@ -402,8 +410,8 @@ Da man die Werte $a^{(2^i)}$ erhalten kann, indem man in jedem Schritt $a$ quadr
 und die Multiplikationen auch schrittweise erfolgen k"onnen, (s.~Quell\-code\-aus\-schnitt~\ref{code:square-and-multiply})
 wird hier wiederholt quadriert und multipliziert.
 Von diesem grundlegenen Algorithmus existieren Abwandlungen,
-die durch noch weniger Multiplikationen mehr Effizienz erreichen.
-Diese beschreibe ich allerdings nicht hier~\cite{hac}.
+die durch noch weniger Multiplikationen mehr Effizienz erreichen~\cite{hac}.
+Diese beschreibe ich allerdings nicht hier.
 
 Im einfachen square-and-multiply werden $\lceil \log_2 b \rceil + 1$ bis $2 \lceil \log_2 b \rceil$
 ($\lceil x \rceil$ bezeichnet die kleinste ganze Zahl, die gr"o"ser oder gleich $x$ ist)
@@ -452,13 +460,13 @@ Die bin"are Darstellung von $89$ ist $1011001_2$. \\
     \hline
     -- & -- & $1$ & $1$ & $429$ & $429$ & 0 \\
     \hline
-    0 & 1 & $429$ & $429$ & $429$ & $1076$ & 1 \\
-    1 & 0 & $429$ & $429$ & $429^2$ & $1119$ & 2 \\
-    2 & 0 & $429$ & $429$ & $429^4$ & $44$ & 3 \\
-    3 & 1 & $429 \cdot 429^8 = 429^9$ & $1375$ & $429^8$ & $345$ & 5 \\
-    4 & 1 & $429^9 \cdot 429^{16} = 429^{25}$ & $257$ & $429^{16}$ & $1291$ & 7 \\
-    5 & 0 & $429^{25}$ & $257$ & $429^{32}$ & $904$ & 8 \\
-    6 & 1 & $429^{89}$ & $42$ & $429^{64}$ & $1033$ & 10 \\
+    0 & 1 & $429$ & $429$ & $429$ & $429$ & 1 \\
+    1 & 0 & $429$ & $429$ & $429^2$ & $1076$ & 2 \\
+    2 & 0 & $429$ & $429$ & $429^4$ & $1119$ & 3 \\
+    3 & 1 & $429 \cdot 429^8 = 429^9$ & $1375$ & $429^8$ & $44$ & 5 \\
+    4 & 1 & $429^9 \cdot 429^{16} = 429^{25}$ & $257$ & $429^{16}$ & $345$ & 7 \\
+    5 & 0 & $429^{25}$ & $257$ & $429^{32}$ & $1291$ & 8 \\
+    6 & 1 & $429^{25} \cdot 429^{64} = 429^{89}$ & $42$ & $429^{64}$ & $904$ & 10 \\
 \end{tabular}
 
 \subsection{Primzahlen finden}
@@ -467,7 +475,7 @@ Die bin"are Darstellung von $89$ ist $1011001_2$. \\
 Um Schl"ussel zu generieren, braucht man zun"achst Primzahlen.
 Um diese Primzahlen zu erhalten, ist es aufgrund der Gr"o"se
 (mindestens ca.\@ 1024 Bits bzw.\@ 308 Ziffern)
-inpraktikabel (darauf beruht die Sicherheit),
+impraktikabel (darauf beruht die Sicherheit),
 alle Primzahlen bis zu einer der richtigen Gr"o"se zu finden.
 Daher sieht die Prozedur zur Primzahlengeneration wie folgt aus~\cite{hac}:
 \begin{quote}
@@ -487,14 +495,15 @@ und die "`echten"', die tats"achlich beweisen k"onnen, dass eine Zahl prim ist~\
 
 Letztere sind generell komplexer, zeitaufw"andiger und funktionieren tw.\@ nur
 f"ur spezielle Zahlen.
-Zufallsabh"angige Tests k"onnen durch Wahl einer geeigneten Wiederholungszahl
+Zufallsabh"angige Tests k"onnen durch Wahl einer geeigneten Wie\-der\-hol\-ungs\-zahl
 auch hochverl"asslich gemacht werden.
 Auch ist es m"oglich, ein hybrides Verfahren verwenden,
 indem man zun"achst mit probabilistischen Tests
-wahrscheinliche Primzahlen findet und dann mit komplexeren Tests
+wahr\-schein\-liche Primzahlen findet und dann mit komplexeren Tests
 diese wenige Zahlen pr"uft~\cite{hac}.
 
 \subsubsection{Der Miller-Rabin-Test}
+\label{subsubsec:practical:primes:miller_rabin}
 Der Miller-Rabin-Test ist ein probabilistischer Test, der "`nur"' beweisen kann,
 dass eine Zahl zusammengesetzt ist.
 Daf"ur wird die Tatsache verwendet, dass f"ur eine Primzahl $p = 2^s r+1$ mit $r, s \in \mathbb{N}$
@@ -506,9 +515,9 @@ Dabei kann wegen $a^{(2^j)r} = (a^r)^{(2^j)}$ w"ahrend der "Uberpr"ufung von
 $a^{(2^j)r} \equiv -1 \mod p$ der Initialwert $a^r$ bei Erh"ohung von $j$ einfach quadriert werden,
 sodass insgesamt weniger Rechnungen als bei einer naiven Implementation ben"otigt werden~\cite{hac}.
 
-Gilt keine der Kongruenzen, wird angenommen, dass die Zahl prim ist.
+Gilt eine der Kongruenzen, wird angenommen, dass die Zahl prim ist.
 F"ur eine ungerade zusammengesetzte Zahl $n$ gilt,
-dass maximal $\frac{1}{4}$ der Zahlen $a$ mit $2 \leq a \leq n-1$ die Kongruenzen nicht erf"ullen,
+dass maximal $\frac{1}{4}$ der Zahlen $a$ mit $2 \leq a \leq n-1$ eine der Kongruenzen erf"ullen,
 d.h., dass f"alschlicherweise eine Primzahl angenommen wird.
 W"ahlt man $a$ zuf"allig, sinkt die maximale Wahrscheinlichkeit, zusammengesetzte Zahlen als prim zu erkennen,
 mit jedem $a$ um Faktor $\frac{1}{4}$, also exponentiell.
@@ -542,7 +551,7 @@ In \texttt{openpgp/rsa.py} ab Zeile 18 ist eine bessere Implementation zu finden
 
 \paragraph{Beispiel}
 Wir wollen pr"ufen, ob $n = 8353$ prim ist, und bestimmen dazu zun"achst $r, s$ so, dass $n - 1 = 2^s r$.
-Dazu teilt man sowiet wie m"oglich $n-1 = 8352$ durch 2:
+Dazu teilt man soweit wie m"oglich $n-1 = 8352$ durch 2:
 \[ \frac{8352}{2} = 4176 \qquad \frac{4176}{2} = 2088 \qquad \frac{2088}{2} = 1044 \qquad
 \frac{1044}{2} = 522 \qquad \frac{522}{2} = 261 \]
 Daher ist $n-1 = 8352 = 2^5 \cdot 261$, also ist $s = 5$ und $r = 261$.
@@ -592,7 +601,7 @@ auf noch niedrigere Werte gebracht werden:\\
 % Warum man Padding benutzt. Entweder nur die f"ur OpenPGP benutzten Teile oder alles. Vielleicht auch nur die vorletzte Version.
 
 Auch wenn RSA wie oben beschrieben als sicher angenommen wird, kann es in der praktischen
-Anwendung beispielsweise bei kurzen Nachrichten zu Sicherheitsl"ucken kommen~\cite{sinews}. \todo{Auch komplett zitieren?}
+Anwendung beispielsweise bei kurzen Nachrichten zu Sicherheitsl"ucken kommen~\cite{sinews}.
 Um dies zu verhindern, wurde der sog.\@ Public-Key Cryptography Standard \#1 geschrieben,
 der das Format einer mit RSA verschl"usselten Nachricht sowie einer RSA-Unterschrift festlegt.
 
@@ -609,8 +618,10 @@ dass kurze Nachrichten Sicherheitsprobleme darstellen~\cite{rfc4480,sinews}.
 
 Bei Unterschriften wird nicht die zu unterschreibende Nachricht selbst,
 sondern ein sog.\@ "`hash"' oder "`Streuwert"', ein der Nachricht eindeutig zugeordneter Wert,
-der idealerweise (sonst k"onnen Unterschriften gef"alscht werden) m"oglichst kol\-li\-si\-ons\-re\-sis\-tent ist,
-mathematisch unterschrieben.
+der idealerweise (sonst k"onnen Unterschriften gef"alscht werden) m"oglichst
+kol\-li\-si\-ons\-re\-sis\-tent, d.h.\@, dass es sehr schwierig ist,
+zwei unterschiedlichen Nachrichten, denen der gleiche Wert zugeordnet wird, zu finden,
+ist, mathematisch unterschrieben.
 Auch hierbei werden zus"atzliche Bytes angef"ugt: erst \verb|00 01|, dann zuf"allig gew"ahlte, nicht genullte Bytes,
 \verb|00| und, zus"atzlich zum Format f"ur Verschl"usselung, eine den Hashalgorithmus identifizierende konstante Bytefolge.
 
@@ -625,7 +636,8 @@ Zum Finden der ben"otigten Primzahlen verwende ich den Miller-Rabin-Algorithmus.
 Die Werte von $r$ und $s$ f"ur $n = 2^s r + 1$ finde ich, indem ich soweit wie m"oglich
 $n - 1$ fortlaufend durch zwei teile und einen Z"ahler erh"ohe.
 
-F"ur die Primzahlpr"ufung an sich verwende ich den Algorithmus wie in~\cite{hac} beschrieben.
+F"ur die Primzahlpr"ufung an sich verwende ich den Algorithmus wie
+in Abschnitt~\ref{subsubsec:practical:primes:miller_rabin} be\-schrie\-ben.
 Dabei wende ich die bereits beschriebene Optimierung der einzelnen Quadratur pro Schritt an.
 Zu beachten ist, dass die Modulo-Funktion bzw.\@ der \verb|%|-Operator
 die kleinste positive die entsprechende Kongruenz erf"ullende Zahl zur"uckgeben,
@@ -633,7 +645,7 @@ weshalb die Tests $z \equiv -1 \mod n$ als \verb|z % n == n-1| geschrieben werde
 
 Als Wiederholungszahl habe ich 128 festgelegt.
 So ist die Wahrscheinlichkeit, dass eine zusammengesetzte Zahl als prim erkl"art wird,
-$\frac{1}{2^{256}}$, was der Wahrscheinlichkit entspricht, einen AES-256-Schl"ussel%
+$\frac{1}{2^{256}}$, was der Wahrscheinlichkeit entspricht, einen AES-256-Schl"ussel%
 \footnote{AES-256 ist der symmetrische Algorithmus,
 der u.a.\@ von den USA f"ur streng geheime Informationen verwendet wird}
 beim ersten Versuch zu erraten.
@@ -643,14 +655,15 @@ Mit gefundenen Primzahlen erstelle ich "uber die im mathematischen Teil genannte
 dann den "offentlichen und privaten Schl"ussel.
 Auch hier muss auf negative Werte (als Ergebnis des erweiterten Euklidschen Algorithmus)
 achtgegeben werden: Um einen postiven Wert f"ur $d$ zu erhalten, der die ben"otigte Kongruenz
-$ed \equiv 1 \mod \phi(n)$ erf"ullt, kann hier die Modulufunktion bzw.\@ der \verb|%|-Operator
+$ed \equiv 1 \mod \phi(n)$ erf"ullt, kann hier die Modulofunktion bzw.\@ der \verb|%|-Operator
 verwendet werden.
 Dabei lege ich $e = 65537$ (aus in Abschnitt~\ref{subsec:practical:primes} genannten Effizienzgr"unden) fest.
 Die Berechnung von $\phi(n)$ ist ebenfalls direkt als $n - p - q + 1$ implementiert.
 
 \subsubsection{Ver- und Entschl"usselung, Unterschriften}
-Der grundlegene Ver- und Entschl"usseldungsprozess ist buchst"ablich:
+Der grundlegene Ver- und Entschl"usseldungsprozess ist buchst"ablich, wie in \\ \texttt{openpgp/rsa.py} ab Zeile 57 zu finden:
 \lstinputlisting[firstnumber=57,firstline=57,lastline=59]{../openpgp/rsa.py}
+
 Da in jeder Anwendung Bytes verarbeitet werden, habe ich daf"ur eine die Konvertierung
 durchf"uhrende Wrapperfunktion, \lstinline{crypt_bytes}, geschrieben.
 
@@ -680,7 +693,7 @@ Dabei dachte er vor allem an die Verwendung f"ur E-Mails~\cite{singh}.
 Auf Basis der PGP-Software ist inzwischen der OpenPGP-Standard geschaffen worden,
 der neben S/MIME (Secure/Multipurpose Internet Mail Extensions)
 eines der Hauptformate f"ur verschl"usselte und digital unterschriebene E-Mails ist.
-Trotz dieser starken Nutzung eigent sich OpenPGP durchaus f"ur die Verschl"usselung
+Trotz dieser starken Nutzung eignet sich OpenPGP durchaus f"ur die Verschl"usselung
 von station"aren Daten.
 Es gibt ebenfals einen Modus f"ur symmetrische Verschl"usselung mit Passwort~\cite{rfc4480}.
 
@@ -707,7 +720,7 @@ die entweder einem Hauptschl"ussel erlauben, Unterschl"ussel an sich zu binden o
 einer Person erlauben, die Genauigkeit einer "`User ID"', also der Zuordnung eines Schl"ussels
 zu einer realen Person, zu best"atigen~\cite{rfc4480}.
 Letztere erlauben es, ohne direkten (pers"onlichen) Austausch von Schl"usseln mit Personen
-verschl"usselt zu kommunizieren, indem man erhaltene Schl"ussel "uber Unterschriften
+ver\-schl"us\-selt zu kommunizieren, indem man erhaltene Schl"ussel "uber Unterschriften
 durch Personen, die man bereits kennt, validiert.
 
 OpenPGP definiert 17 verschiedene "`Packets"',%
@@ -750,8 +763,6 @@ wobei Unterschriften immer Schl"usseln oder Nachrichten zugeordnet werden.
 Aus dieser Darstellung werden dann je nach dem, was gemacht werden soll,
 neue Nachrichten, Unterschriften oder verschl"usselte Packets erstellt,
 die dann ausgegeben werden.
-
-\todo{Mehr schreiben}
 
 \subsection{Beispiele}
 Alle der folgenden Beispiele beginnen mit einer Shell-Zeile, die mit \verb|$| beginnt,
@@ -878,46 +889,49 @@ No such key:  Key 2
 \end{lstlisting}
 
 \section{Ausleitung}
-Facharbeitshinweise:
-\begin{quote}
-Der Schluss sollte die Fragestellung aus der Einleitung aufgreifen und die wichtigsten Untersuchungsergebnisse zusammenfassen. Er kann den Untersuchungsgegenstand in größere Zusammenhänge einordnen und einen Ausblick auf künftige Entwicklungen enthalten. Auch kann hier das methodische Vorgehen kritisch reflektiert werden.
-\end{quote}
 
-RSA fu"st, wie in dieser Arbeit deutlich gemacht, auf zwei Grundlagen:
+RSA basiert, wie in dieser Arbeit deutlich gemacht, auf zwei Grundlagen:
 die der modularen Arithmetik, besonders in Kombination mit Exponentiation
 und die der Primzahlen.
 
-Modulare Arithmetik spielt auch in anderen asmmetrischen Kryptosystemen,
-wie etwa dem Diffie-Hellmen key exchange oder ElGamal, eine gro"se Rolle.
-Entsprechend ist auch die praktische Verschnellerung odularer Exponentiation
+Modulare Arithmetik spielt auch in anderen asymmetrischen Kryptosystemen,
+wie etwa dem Diffie-Hellman key exchange oder ElGamal, eine gro"se Rolle.
+Ent\-sprech\-end ist auch die praktische Verschnellerung modularer Exponentiation
 weitlaufend untersucht.
-In dieser Arbeit ist nur eine simple Grundlage n"aher besprochen worden,
+In dieser Arbeit ist mit dem square-and-multiply-Verfahren nur eine einfache Methode dieser Verschnellerung n"aher besprochen worden,
 jedoch sind Leser eingeladen, auch "uber andere bzw.\@ verbesserte Ans"atze
-in Kapitel 14.6 der Quelle~\cite{hac} zu lesen.
+in Kapitel 14.6 der Quelle~\cite{hac} vertiefend nachzulesen.
 
-Primzahlen, von ihrer mathematischen Natur aus eines der abstraktesten Themen,
-sind durch asymmetrische Kryptographie wichtig in der praktischen Anwendung geworden.
-Insgesamt hat die Zahlentheorie durch asymmetrische Kryptographie enorm an praktischer Bedeutung gewonnen.
+Primzahlen, deren Untersuchung jahrhunderte als rein mathematisch galt,
+haben durch asymmetrische Kryptographie eine fundamentale Anwendung gefunden.
+Auch weitere Bereiche der Zahlentheorie insgesamt, wie die Untersuchung elliptischer Kurven,
+haben durch asymmetrische Kryptographie enorm an praktischer Bedeutung gewonnen.
 
-Obwohl derzeit auf elliptischen Kurven (auch eine sehr abstrakte methematische Grundlage)
+Obwohl derzeit auf elliptischen Kurven
 basierende asymmetrische Kryptographie st"arker verwendet wird,
 ist absehbar, dass RSA f"ur die breiten Bev"olkerungsmassen als Bestandteil
 der TLS-Rootzertifikate in Webbrowsern noch Jahre und in speziellen Anwendungen m"oglicherweise
 noch Jahrzehnte relevant bleiben wird.
 
 W"ahrend OpenPGP selbst f"ur die meisten Menschen nur indirekt relevant ist,
-z.B.\@ "uber GPG-unterschriebene git-Tags neuer Linux-Versionen, welche die Grundlage f"ur Android bilden,
-sind die allgemeinen Konzepte beispielsweise bez"uglich hybrider Kryptographie allgemein
+z.B.\@ "uber GPG-unterschriebene%
+\footnote{GPG oder GnuPG oder GNU Privacy Guard ist eine freie Implementation des OpenPGP-Standards,
+die extensiv in der Entwicklung freier Software verwendet wird.}
+git-Tags\footnote{git ist ein von Linus Torvalds f"ur die Linux-Entwicklung entwickeltes jedoch inzwischen weit verbreitetes
+(und auch f"ur diese Facharbeit verwendetes) Versionskontrollsystem.
+Ein Tag verweist mit einem Namen auf einen bestimmten Zustand des Quellcodes bzw.\@ der Daten unter Versionskontrolle.
+"Uber eine Unterschrift kann versichert werden, dass die vorhandene Version tats"achlich von einem vertrauten Entwickler abgesegnet wurde.} neuer Linux-Versionen, welche die Grundlage f"ur Android-Systeme bilden,
+sind die allgemeinen Konzepte beispielsweise be\-z"ug\-lich hybrider Kryptographie allgemein
 auf viele praktische Anwendungen direkt "ubertragbar.
 
+\newpage
 \appendix
 
 \addcontentsline{toc}{section}{Literatur}
 \input{citations.tex}
 
-\section{kompletter Quellcode}
-\todo{sind ca. 30 Seiten}
-\lstset{language=Python}
+\section{Quellcode und Beispiele}
+%\lstset{language=Python}
 %\lstinputlisting{../openpgp/__main__.py}
 %\lstinputlisting{../openpgp/rsa.py}
 %\lstinputlisting{../openpgp/common.py}
@@ -929,9 +943,36 @@ auf viele praktische Anwendungen direkt "ubertragbar.
 %\lstinputlisting{../openpgp/aes_ll2.py}
 %\lstinputlisting{../openpgp/openpgp_cfb.py}
 
-\section{Beispieldateien}
+Der Quellcode meiner OpenPGP-Teilimplementation sowie diese Facharbeit (inklusive der Versionshistorie) sind
+online verf"ugbar unter:
+\begin{center}\texttt{https://github.com/mik2k2/fa-mathe-openpgp}\end{center}
 
-\todo{Hochladen}
+Um selbst die Beispiele testen zu k"onnen oder sonstwie zu experimentieren, kann mit \texttt{git} und \texttt{gpg}
+(sollten auf GNU/Linux-Systemen verf"ugbar sein) der Quellcode kopiert und einige Schl"ussel und Nachrichten erstellt werden.
+Dazu sollten die folgenden Schritte (in z.B.\@ \texttt{bash}) ausgef"uhrt werden (mit \verb|$| beginnende Zeilen ohne \verb|$| eintippen):
+
+\begin{verbatim}
+$ git clone https://github.com/mik2k2/fa-mathe-openpgp.git
+[...]
+$ cd fa-mathe-openpgp
+$ ./setup.sh
+[...]
+# Automatisch zu ladende Dateien
+$ export FA_MATHE_OPENPGP_LOADPATH=data/public-keys:data/secret-keys
+# allgemeine hilfe
+$ python3 -m openpgp --help
+[...]
+# Hilfe zu "encrypt" (geht auch bei anderen Kommandos)
+$ python3 -m openpgp encrypt --help
+[...]
+\end{verbatim}
+
+Durch \verb|./setup.py| werden in \texttt{data} einige Schl"ussel sowie einige Beispielnachrichten erstellt.
+Ein komplettes Schl"usselset (inklusive der privaten Schl"ussel) ist unter \\ \texttt{data/complete-key-set} verf"ugbar,
+sollte aber bei den Beispielen nicht wichtig sein.
+Die Beispielnachrichten sind alle auf \texttt{-message} endende Dateien in \texttt{data} sowie \\ \texttt{data/encrypted-binary}.
+Nat"urlich k"onnen auch neue eigene Nachrichten wie im vorletzten Beispiel erstellt werden
+oder OpenPGP-Nachrichten von anderen Quellen (die automatisch erstellten Beispiele wurden mit GnuPG erstellt) eingelesen werden.
 
 \section{Internetquellen}
 
@@ -942,6 +983,7 @@ auf viele praktische Anwendungen direkt "ubertragbar.
 \paragraph{\cite{sinews}}
 \includegraphics[width=\textwidth]{sinews.pdf}
 
+\newpage
 \section{Selbst"andigkeitserkl"arung}
 Ich habe die vorliegende Facharbeit selbständig angefertigt und keine anderen als die angegebenen Hilfsmittel benutzt.
 Alle "ubernommenen Textteile sind als Zitate gekennzeichnet und mit genauer Quellenangabe belegt. \\~\\
